@@ -4,14 +4,14 @@ import 'features/auth/presentation/screens/register_screen.dart';
 import 'features/resident/presentation/screens/repair_list_screen.dart';
 // import 'features/resident/presentation/screens/create_repair_screen.dart'; // REMOVED
 import 'features/resident/presentation/screens/model_view_screen.dart'; // Import
-import 'features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'features/legal/presentation/screens/legal_dashboard_screen.dart';
 
 import 'package:fcm_app/core/data/auth_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final isLoggedIn = await AuthRepository.instance.isLoggedIn();
-  runApp(FcmApp(initialRoute: isLoggedIn ? '/3d_model' : '/login'));
+  runApp(FcmApp(initialRoute: '/legal')); // Changed to /legal for testing
 }
 
 class FcmApp extends StatelessWidget {
@@ -21,6 +21,7 @@ class FcmApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'FCM System',
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -56,15 +57,7 @@ class FcmApp extends StatelessWidget {
           prefixIconColor: Color(0xFFFFD700),
         ),
       ),
-      initialRoute: initialRoute,
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const RepairListScreen(), // Main Dashboard for Resident
-        // '/create_repair': (context) => const CreateRepairScreen(), // REMOVED
-        '/3d_model': (context) => const ModelViewScreen(), // New Route
-        '/admin': (context) => const AdminDashboardScreen(),
-      },
+      home: const LegalDashboardScreen(), // FORCED HOME
     );
   }
 }
