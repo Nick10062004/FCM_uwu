@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/auth/presentation/screens/register_screen.dart';
 import 'features/resident/presentation/screens/repair_list_screen.dart';
-// import 'features/resident/presentation/screens/create_repair_screen.dart'; // REMOVED
-import 'features/resident/presentation/screens/model_view_screen.dart'; // Import
-import 'features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'features/resident/presentation/screens/model_view_screen.dart';
+import 'features/legal/presentation/screens/legal_dashboard_screen.dart';
 
 import 'package:fcm_app/core/data/auth_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final isLoggedIn = await AuthRepository.instance.isLoggedIn();
-  runApp(FcmApp(initialRoute: isLoggedIn ? '/3d_model' : '/login'));
+  runApp(FcmApp(initialRoute: isLoggedIn ? '/legal' : '/login'));
 }
 
 class FcmApp extends StatelessWidget {
@@ -21,6 +21,7 @@ class FcmApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'FCM System',
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -32,7 +33,8 @@ class FcmApp extends StatelessWidget {
           onPrimary: Colors.black, // Text on Gold
         ),
         useMaterial3: true,
-        fontFamily: 'Roboto',
+        // fontFamily: 'Roboto', // Removed to use GoogleFonts
+        textTheme: GoogleFonts.promptTextTheme(ThemeData.dark().textTheme),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF121212),
           foregroundColor: Color(0xFFFFD700), // Gold Text in AppBar
@@ -42,7 +44,7 @@ class FcmApp extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFFFD700), // Gold Button
             foregroundColor: Colors.black, // Black Text
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
+            textStyle: GoogleFonts.prompt(fontWeight: FontWeight.bold),
           ),
         ),
         inputDecorationTheme: const InputDecorationTheme(
@@ -60,10 +62,9 @@ class FcmApp extends StatelessWidget {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
-        '/home': (context) => const RepairListScreen(), // Main Dashboard for Resident
-        // '/create_repair': (context) => const CreateRepairScreen(), // REMOVED
-        '/3d_model': (context) => const ModelViewScreen(), // New Route
-        '/admin': (context) => const AdminDashboardScreen(),
+        '/legal': (context) => const LegalDashboardScreen(),
+        '/repair_list': (context) => const RepairListScreen(),
+        '/3d_model': (context) => const ModelViewScreen(),
       },
     );
   }

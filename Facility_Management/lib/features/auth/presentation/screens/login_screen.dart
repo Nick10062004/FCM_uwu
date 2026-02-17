@@ -257,8 +257,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
            Navigator.pushReplacementNamed(
             context, 
-            '/3d_model',
-            arguments: userId ?? 'User',
+            '/legal',
           );
         }
       } else {

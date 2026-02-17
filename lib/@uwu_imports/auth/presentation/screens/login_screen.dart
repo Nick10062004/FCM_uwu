@@ -5,7 +5,110 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
-import '../../../../core/data/auth_repository.dart';
+
+// --- Theme Data ---
+class LoginTheme {
+  final String name;
+  final Color bg1;
+  final Color bg2;
+  final Color accent;
+  final Color accentDark;
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color panelBg;
+  final Color panelBorder;
+  final Color fieldBg;
+  final Color fieldBorder;
+  final Color scaffoldBg;
+  final Color chipColor; // for the picker dot
+  final Brightness brightness;
+
+  const LoginTheme({
+    required this.name,
+    required this.bg1,
+    required this.bg2,
+    required this.accent,
+    required this.accentDark,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.panelBg,
+    required this.panelBorder,
+    required this.fieldBg,
+    required this.fieldBorder,
+    required this.scaffoldBg,
+    required this.chipColor,
+    this.brightness = Brightness.dark,
+  });
+}
+
+const List<LoginTheme> kThemes = [
+  // 0 - Black Gold (current/default)
+  LoginTheme(
+    name: 'Black Gold',
+    bg1: Color(0xFF0D0D0E),
+    bg2: Color(0xFF1A1A1C),
+    accent: Color(0xFFC5A059),
+    accentDark: Color(0xFF8B7348),
+    textPrimary: Colors.white,
+    textSecondary: Colors.white54,
+    panelBg: Colors.black54,
+    panelBorder: Colors.white10,
+    fieldBg: Color(0x0DFFFFFF), // white 5%
+    fieldBorder: Color(0x14FFFFFF), // white 8%
+    scaffoldBg: Colors.black,
+    chipColor: Color(0xFFC5A059),
+  ),
+  // 1 - White Clean
+  LoginTheme(
+    name: 'White',
+    bg1: Color(0xFFF5F5F5),
+    bg2: Color(0xFFFFFFFF),
+    accent: Color(0xFF333333),
+    accentDark: Color(0xFF555555),
+    textPrimary: Color(0xFF111111),
+    textSecondary: Color(0xFF777777),
+    panelBg: Color(0xCCFFFFFF), // white 80%
+    panelBorder: Color(0x1A000000), // black 10%
+    fieldBg: Color(0x0A000000), // black 4%
+    fieldBorder: Color(0x14000000), // black 8%
+    scaffoldBg: Color(0xFFF5F5F5),
+    chipColor: Color(0xFFEEEEEE),
+    brightness: Brightness.light,
+  ),
+  // 2 - White Blue
+  LoginTheme(
+    name: 'White Blue',
+    bg1: Color(0xFFE8EEF4),
+    bg2: Color(0xFFF0F4F8),
+    accent: Color(0xFF1565C0),
+    accentDark: Color(0xFF0D47A1),
+    textPrimary: Color(0xFF1A237E),
+    textSecondary: Color(0xFF5C6BC0),
+    panelBg: Color(0xCCF0F4F8), // frosted white-blue
+    panelBorder: Color(0x221565C0), // blue 13%
+    fieldBg: Color(0x0A1565C0), // blue 4%
+    fieldBorder: Color(0x141565C0), // blue 8%
+    scaffoldBg: Color(0xFFE8EEF4),
+    chipColor: Color(0xFF1565C0),
+    brightness: Brightness.light,
+  ),
+  // 3 - Orange Blue
+  LoginTheme(
+    name: 'Orange Blue',
+    bg1: Color(0xFF0D1B2A),
+    bg2: Color(0xFF1B2838),
+    accent: Color(0xFFFF6B35),
+    accentDark: Color(0xFFCC5529),
+    textPrimary: Color(0xFFE0E7EF),
+    textSecondary: Color(0xFF8899AA),
+    panelBg: Color(0x880D1B2A), // navy 53%
+    panelBorder: Color(0x22FF6B35), // orange 13%
+    fieldBg: Color(0x0DFF6B35), // orange 5%
+    fieldBorder: Color(0x14FF6B35), // orange 8%
+    scaffoldBg: Color(0xFF0D1B2A),
+    chipColor: Color(0xFFFF6B35),
+  ),
+];
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,6 +123,9 @@ class _LoginScreenState extends State<LoginScreen>
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
+  final _houseIdController = TextEditingController();
+  final _nationalIdController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _loginFormKey = GlobalKey<FormState>();
   final _registerFormKey = GlobalKey<FormState>();
   bool _isLoading = false;
@@ -29,8 +135,14 @@ class _LoginScreenState extends State<LoginScreen>
   bool _isButtonHovered = false;
   bool _isAccessButtonHovered = false; // Added for top-right button
   bool _isSwitchHovered = false; // Added for bottom toggle links
-  static const Color accentGold = Color(0xFFC5A059);
-  static const Color deepGold = Color(0xFF8B7348);
+  int _currentThemeIndex = 0;
+
+  // Theme-aware color getters
+  LoginTheme get _theme => kThemes[_currentThemeIndex];
+  Color get _accent => _theme.accent;
+  Color get _accentDark => _theme.accentDark;
+  Color get _textPrimary => _theme.textPrimary;
+  Color get _textSecondary => _theme.textSecondary;
   int _currentFeatureIndex = 0;
 
   int _currentSeasonIndex = 0;
@@ -139,30 +251,38 @@ class _LoginScreenState extends State<LoginScreen>
     _emailController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
+    _houseIdController.dispose();
+    _nationalIdController.dispose();
+    _phoneController.dispose();
     _weatherController.dispose();
     _seasonTransitionController.dispose();
     super.dispose();
   }
 
   Future<void> _handleAuth() async {
-    if (_loginFormKey.currentState!.validate()) {
+    final formKey = _isLoginMode ? _loginFormKey : _registerFormKey;
+    if (formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      final email = _emailController.text.trim();
-      final password = _passwordController.text;
-
       if (_isLoginMode) {
-        final result = await AuthRepository.instance.login(email, password);
+        // Role-based routing
+        await Future.delayed(const Duration(milliseconds: 500));
         setState(() => _isLoading = false);
-        if (result['success']) {
-          if (mounted) {
-            Navigator.pushReplacementNamed(context, '/legal');
+        if (mounted) {
+          final email = _emailController.text.trim().toLowerCase();
+          String route = '/3d_model'; // Default for residents
+
+          if (email == 'admin@gmail.com') {
+            route = '/juristic';
+          } else if (email == 'technician@gmail.com') {
+            route = '/technician';
           }
-        } else {
-          if (mounted) _showError(result['error']);
+
+          Navigator.pushReplacementNamed(context, route, arguments: email);
         }
       } else {
         // Quick Success for Sign Up
+        await Future.delayed(const Duration(milliseconds: 500));
         setState(() => _isLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -187,7 +307,7 @@ class _LoginScreenState extends State<LoginScreen>
     final isMobile = screenWidth < 950;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: _theme.scaffoldBg,
       body: Stack(
         children: [
           _buildBackground(screenWidth, isMobile),
@@ -199,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen>
                 child: GestureDetector(
                   onTap: () {},
                   behavior: HitTestBehavior.opaque,
-                  child: Container(color: Colors.black.withOpacity(0.01)),
+                  child: Container(color: _theme.scaffoldBg.withOpacity(0.01)),
                 ),
               ),
             ),
@@ -207,6 +327,7 @@ class _LoginScreenState extends State<LoginScreen>
           if (!isMobile && !_isPanelOpen) _buildHeroTagline(),
           if (!isMobile) _buildFeatureTicker(),
           if (!isMobile) _buildSeasonStatus(), // Added to bottom-right
+          if (!isMobile && !_isPanelOpen) _buildThemeSwitcher(),
           Positioned(
             top: 40,
             left: isMobile ? 24 : 60,
@@ -240,12 +361,22 @@ class _LoginScreenState extends State<LoginScreen>
         final currentSeason = _seasons[_currentSeasonIndex];
         final previousSeason = _seasons[_previousSeasonIndex];
 
+        // Season gradient (original dark)
+        final seasonColor1 = Color.lerp(
+            previousSeason['colors'][0], currentSeason['colors'][0], t)!;
+        final seasonColor2 = Color.lerp(
+            previousSeason['colors'][1], currentSeason['colors'][1], t)!;
+
+        // Blend season with theme background (0 = pure theme, 1 = pure season)
+        final isDarkTheme = _theme.brightness == Brightness.dark;
+        final blendFactor = isDarkTheme ? 0.85 : 0.15;
         final List<Color> colors = [
-          Color.lerp(
-              previousSeason['colors'][0], currentSeason['colors'][0], t)!,
-          Color.lerp(
-              previousSeason['colors'][1], currentSeason['colors'][1], t)!,
+          Color.lerp(_theme.bg1, seasonColor1, blendFactor)!,
+          Color.lerp(_theme.bg2, seasonColor2, blendFactor)!,
         ];
+
+        // Adjust model exposure based on theme brightness
+        final modelExposure = isDarkTheme ? 0.8 : 1.6;
 
         return Stack(
           children: [
@@ -259,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen>
             Positioned.fill(
               child: IgnorePointer(
                 child: ModelViewer(
-                  key: const ValueKey('fcm_house_model_stable'),
+                  key: ValueKey('fcm_house_$_currentThemeIndex'),
                   backgroundColor: Colors.transparent,
                   src: 'assets/models/house.glb',
                   alt: 'FCM House Model',
@@ -267,9 +398,9 @@ class _LoginScreenState extends State<LoginScreen>
                   autoPlay: true,
                   cameraControls: false,
                   disableZoom: true,
-                  exposure: 0.8, // Slightly lower to avoid aliasing artifacts
-                  shadowIntensity: 0.2, // Very subtle to keep it Zen
-                  shadowSoftness: 1.0, // Soft for stability
+                  exposure: modelExposure,
+                  shadowIntensity: isDarkTheme ? 0.2 : 0.6,
+                  shadowSoftness: 1.0,
                   rotationPerSecond: '10deg',
                   cameraTarget: 'auto 1m auto',
                   cameraOrbit: '45deg 75deg 80%',
@@ -316,9 +447,9 @@ class _LoginScreenState extends State<LoginScreen>
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-              border: Border.all(color: accentGold.withOpacity(0.5), width: 1),
+              border: Border.all(color: _accent.withOpacity(0.5), width: 1),
               borderRadius: BorderRadius.circular(8)),
-          child: const Icon(Icons.shield_rounded, color: accentGold, size: 24),
+          child: Icon(Icons.shield_rounded, color: _accent, size: 24),
         ),
         const SizedBox(width: 14),
         Column(
@@ -329,12 +460,12 @@ class _LoginScreenState extends State<LoginScreen>
                 style: GoogleFonts.playfairDisplay(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: _textPrimary,
                     letterSpacing: 2)),
             Text('ENTERPRISE QUALITY MANAGEMENT',
                 style: GoogleFonts.outfit(
                     fontSize: 9,
-                    color: accentGold.withOpacity(0.9),
+                    color: _accent.withOpacity(0.9),
                     letterSpacing: 3,
                     fontWeight: FontWeight.w500)),
           ],
@@ -362,13 +493,11 @@ class _LoginScreenState extends State<LoginScreen>
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                      color: accentGold.withOpacity(0.05), // Reduced from 0.1
+                      color: _accent.withOpacity(0.05),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                          color: accentGold
-                              .withOpacity(0.15))), // Reduced from 0.3
+                      border: Border.all(color: _accent.withOpacity(0.15))),
                   child: Icon(feature['icon'],
-                      color: accentGold.withOpacity(0.8), size: 26)),
+                      color: _accent.withOpacity(0.8), size: 26)),
               const SizedBox(width: 16),
               Expanded(
                   child: Column(
@@ -379,11 +508,11 @@ class _LoginScreenState extends State<LoginScreen>
                         style: GoogleFonts.playfairDisplay(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: Colors.white)),
+                            color: _textPrimary)),
                     const SizedBox(height: 4),
                     Text(feature['desc'],
                         style: GoogleFonts.outfit(
-                            fontSize: 12, color: Colors.white54))
+                            fontSize: 12, color: _textSecondary))
                   ])),
             ],
           ),
@@ -408,14 +537,13 @@ class _LoginScreenState extends State<LoginScreen>
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: _isAccessButtonHovered
-                  ? [accentGold, deepGold]
-                  : [deepGold, accentGold],
+                  ? [_accent, _accentDark]
+                  : [_accentDark, _accent],
             ),
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               BoxShadow(
-                color:
-                    accentGold.withOpacity(_isAccessButtonHovered ? 0.6 : 0.3),
+                color: _accent.withOpacity(_isAccessButtonHovered ? 0.6 : 0.3),
                 blurRadius: _isAccessButtonHovered ? 25 : 20,
                 offset: Offset(0, _isAccessButtonHovered ? 10 : 8),
               ),
@@ -424,13 +552,19 @@ class _LoginScreenState extends State<LoginScreen>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.login_rounded, color: Colors.black, size: 18),
+              Icon(Icons.login_rounded,
+                  color: _theme.brightness == Brightness.dark
+                      ? Colors.black
+                      : Colors.white,
+                  size: 18),
               const SizedBox(width: 10),
               Text('Sign In',
                   style: GoogleFonts.outfit(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: Colors.black,
+                      color: _theme.brightness == Brightness.dark
+                          ? Colors.black
+                          : Colors.white,
                       letterSpacing: 1)),
             ],
           ),
@@ -442,15 +576,14 @@ class _LoginScreenState extends State<LoginScreen>
   Widget _buildPanel(bool isMobile) {
     return Container(
       decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          border: Border(
-              left: BorderSide(color: Colors.white.withAlpha(20), width: 1))),
+          color: _theme.panelBg,
+          border:
+              Border(left: BorderSide(color: _theme.panelBorder, width: 1))),
       child: ClipRect(
         child: BackdropFilter(
-          filter:
-              ImageFilter.blur(sigmaX: 15, sigmaY: 15), // Reduced for stability
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
-            color: Colors.black.withOpacity(0.4), // Darker overlay fallback
+            color: _theme.panelBg,
             child: Stack(
               children: [
                 if (!isMobile)
@@ -459,10 +592,10 @@ class _LoginScreenState extends State<LoginScreen>
                     right: 32,
                     child: IconButton(
                       onPressed: () => setState(() => _isPanelOpen = false),
-                      icon: const Icon(Icons.close_rounded,
-                          color: Colors.white30, size: 24),
+                      icon: Icon(Icons.close_rounded,
+                          color: _textSecondary, size: 24),
                       style: IconButton.styleFrom(
-                          backgroundColor: Colors.white.withOpacity(0.05)),
+                          backgroundColor: _accent.withOpacity(0.05)),
                     ),
                   ),
                 Center(
@@ -474,7 +607,8 @@ class _LoginScreenState extends State<LoginScreen>
                       key: ValueKey(_isLoginMode),
                       padding: const EdgeInsets.symmetric(horizontal: 60),
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 360),
+                        constraints:
+                            BoxConstraints(maxWidth: _isLoginMode ? 360 : 440),
                         child: _isLoginMode
                             ? _buildLoginForm()
                             : _buildRegisterForm(),
@@ -500,10 +634,10 @@ class _LoginScreenState extends State<LoginScreen>
               style: GoogleFonts.playfairDisplay(
                   fontSize: 36,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white)),
+                  color: _textPrimary)),
           const SizedBox(height: 8),
           Text('Welcome back. Please enter your credentials.',
-              style: GoogleFonts.outfit(fontSize: 14, color: Colors.white54)),
+              style: GoogleFonts.outfit(fontSize: 14, color: _textSecondary)),
           const SizedBox(height: 48),
           _buildField('Email', _emailController, Icons.email_outlined),
           const SizedBox(height: 24),
@@ -514,8 +648,8 @@ class _LoginScreenState extends State<LoginScreen>
               alignment: Alignment.centerRight,
               child: TextButton(
                   onPressed: () {},
-                  child: const Text('Forgot password?',
-                      style: TextStyle(color: accentGold, fontSize: 13)))),
+                  child: Text('Forgot password?',
+                      style: TextStyle(color: _accent, fontSize: 13)))),
           const SizedBox(height: 40),
           _buildPrimaryButton('Sign In'),
           const SizedBox(height: 32),
@@ -532,24 +666,72 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Sign Up',
+          Text('Resident Registration',
               style: GoogleFonts.playfairDisplay(
-                  fontSize: 36,
+                  fontSize: 32,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white)),
+                  color: _textPrimary)),
           const SizedBox(height: 8),
-          Text('Create an account to start managing assets.',
-              style: GoogleFonts.outfit(fontSize: 14, color: Colors.white54)),
-          const SizedBox(height: 48),
-          _buildField('Full Name', _nameController, Icons.person_outline),
-          const SizedBox(height: 24),
-          _buildField('Email', _emailController, Icons.email_outlined),
-          const SizedBox(height: 24),
+          Text(
+              'Please fill in your real information for identity verification.',
+              style: GoogleFonts.outfit(fontSize: 14, color: _textSecondary)),
+          const SizedBox(height: 36),
+          // Row 1: Full Name + House ID
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: _buildField(
+                    'Full Name', _nameController, Icons.person_outline,
+                    hint: 'e.g. John Smith'),
+              ),
+              const SizedBox(width: 16),
+              SizedBox(
+                width: 130,
+                child: _buildField(
+                    'House ID', _houseIdController, Icons.home_outlined,
+                    hint: 'e.g. 123/45'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Row 2: National ID (full width)
+          _buildField('National ID (13 digits)', _nationalIdController,
+              Icons.badge_outlined,
+              hint: 'e.g. 1234567890123',
+              keyboardType: TextInputType.number,
+              maxLength: 13, customValidator: (value) {
+            if (value == null || value.isEmpty) return 'Required';
+            if (value.length != 13) return 'Must be exactly 13 digits';
+            if (!RegExp(r'^[0-9]+$').hasMatch(value)) return 'Digits only';
+            return null;
+          }),
+          const SizedBox(height: 20),
+          // Row 3: Phone + Email
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: 160,
+                child: _buildField(
+                    'Phone Number', _phoneController, Icons.phone_outlined,
+                    hint: 'e.g. 0812345678', keyboardType: TextInputType.phone),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildField(
+                    'Email', _emailController, Icons.email_outlined,
+                    hint: 'e.g. john@email.com'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Row 4: Password
           _buildField('Password', _passwordController, Icons.lock_outline,
               isPassword: true),
-          const SizedBox(height: 40),
-          _buildPrimaryButton('Sign Up'),
-          const SizedBox(height: 32),
+          const SizedBox(height: 36),
+          _buildPrimaryButton('Confirm Registration'),
+          const SizedBox(height: 24),
           _buildSwitchMode('Already have an account?', 'Sign In',
               () => setState(() => _isLoginMode = true)),
         ],
@@ -563,7 +745,8 @@ class _LoginScreenState extends State<LoginScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(text,
-              style: const TextStyle(color: Colors.white38, fontSize: 13)),
+              style: TextStyle(
+                  color: _textSecondary.withOpacity(0.6), fontSize: 13)),
           MouseRegion(
             onEnter: (_) => setState(() => _isSwitchHovered = true),
             onExit: (_) => setState(() => _isSwitchHovered = false),
@@ -573,7 +756,7 @@ class _LoginScreenState extends State<LoginScreen>
               child: AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 200),
                 style: TextStyle(
-                  color: _isSwitchHovered ? Colors.white : accentGold,
+                  color: _isSwitchHovered ? _textPrimary : _accent,
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                   decoration: _isSwitchHovered
@@ -595,7 +778,11 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildField(
       String label, TextEditingController controller, IconData icon,
-      {bool isPassword = false}) {
+      {bool isPassword = false,
+      String? hint,
+      TextInputType? keyboardType,
+      int? maxLength,
+      String? Function(String?)? customValidator}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -603,21 +790,28 @@ class _LoginScreenState extends State<LoginScreen>
             style: GoogleFonts.outfit(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
-                color: Colors.white38)),
+                color: _textSecondary.withOpacity(0.7))),
         const SizedBox(height: 10),
         Container(
           decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: _theme.fieldBg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white.withOpacity(0.08))),
+              border: Border.all(color: _theme.fieldBorder)),
           child: TextFormField(
             controller: controller,
             obscureText: isPassword && !_isPasswordVisible,
-            style: const TextStyle(color: Colors.white, fontSize: 15),
-            validator: (value) =>
-                (value == null || value.isEmpty) ? 'Required' : null,
+            keyboardType: keyboardType,
+            maxLength: maxLength,
+            style: TextStyle(color: _textPrimary, fontSize: 15),
+            validator: customValidator ??
+                (value) => (value == null || value.isEmpty) ? 'Required' : null,
             decoration: InputDecoration(
-              prefixIcon: Icon(icon, color: Colors.white24, size: 20),
+              prefixIcon:
+                  Icon(icon, color: _textSecondary.withOpacity(0.5), size: 20),
+              hintText: hint,
+              hintStyle: TextStyle(
+                  color: _textSecondary.withOpacity(0.3), fontSize: 14),
+              counterText: '', // Hide character counter for maxLength
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
@@ -627,7 +821,7 @@ class _LoginScreenState extends State<LoginScreen>
                           _isPasswordVisible
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: Colors.white24,
+                          color: _textSecondary.withOpacity(0.5),
                           size: 18),
                       onPressed: () => setState(
                           () => _isPasswordVisible = !_isPasswordVisible))
@@ -650,11 +844,11 @@ class _LoginScreenState extends State<LoginScreen>
             borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
                 colors: _isButtonHovered
-                    ? [accentGold, deepGold]
-                    : [deepGold, accentGold]),
+                    ? [_accent, _accentDark]
+                    : [_accentDark, _accent]),
             boxShadow: [
               BoxShadow(
-                  color: accentGold.withOpacity(_isButtonHovered ? 0.4 : 0.15),
+                  color: _accent.withOpacity(_isButtonHovered ? 0.4 : 0.15),
                   blurRadius: _isButtonHovered ? 30 : 15,
                   offset: const Offset(0, 8))
             ]),
@@ -665,16 +859,21 @@ class _LoginScreenState extends State<LoginScreen>
             borderRadius: BorderRadius.circular(12),
             child: Center(
                 child: _isLoading
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 24,
                         height: 24,
                         child: CircularProgressIndicator(
-                            color: Colors.black, strokeWidth: 2))
+                            color: _theme.brightness == Brightness.dark
+                                ? Colors.black
+                                : Colors.white,
+                            strokeWidth: 2))
                     : Text(text,
                         style: GoogleFonts.outfit(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: _theme.brightness == Brightness.dark
+                                ? Colors.black
+                                : Colors.white,
                             letterSpacing: 1))),
           ),
         ),
@@ -695,22 +894,23 @@ class _LoginScreenState extends State<LoginScreen>
               style: GoogleFonts.playfairDisplay(
                   fontSize: 48,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                  height: 1.15)), // Tuned to 1.15 for cohesion
+                  color: _textPrimary,
+                  height: 1.15)),
           Text('Effortlessly.',
               textAlign: TextAlign.right,
               style: GoogleFonts.playfairDisplay(
                   fontSize: 48,
                   fontWeight: FontWeight.w600,
-                  color: accentGold,
-                  height: 1.15)), // Tuned to 1.15 for cohesion
-          const SizedBox(
-              height: 24), // Increased gap to separate hook from info
+                  color: _accent,
+                  height: 1.15)),
+          const SizedBox(height: 24),
           Text(
               'One platform, complete control. Monitor repairs and manage assets with precision.',
               textAlign: TextAlign.right,
               style: GoogleFonts.outfit(
-                  fontSize: 15, color: Colors.white38, height: 1.5)),
+                  fontSize: 15,
+                  color: _textSecondary.withOpacity(0.6),
+                  height: 1.5)),
         ],
       ),
     );
@@ -747,7 +947,71 @@ class _LoginScreenState extends State<LoginScreen>
       child: IgnorePointer(
         child: RepaintBoundary(
           child: CustomPaint(
-              painter: GeometricAccentPainter(accentGold.withOpacity(0.15))),
+              painter: GeometricAccentPainter(_accent.withOpacity(0.15))),
+        ),
+      ),
+    );
+  }
+
+  // --- Theme Switcher ---
+  Widget _buildThemeSwitcher() {
+    return Positioned(
+      bottom: 60,
+      left: MediaQuery.of(context).size.width / 2 - 80,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: _theme.brightness == Brightness.dark
+              ? Colors.white.withOpacity(0.06)
+              : Colors.black.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            color: _theme.brightness == Brightness.dark
+                ? Colors.white.withOpacity(0.08)
+                : Colors.black.withOpacity(0.08),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.palette_outlined,
+                color: _textSecondary.withOpacity(0.5), size: 14),
+            const SizedBox(width: 10),
+            ...List.generate(kThemes.length, (i) {
+              final isActive = i == _currentThemeIndex;
+              return GestureDetector(
+                onTap: () => setState(() => _currentThemeIndex = i),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin:
+                      EdgeInsets.only(right: i < kThemes.length - 1 ? 8 : 0),
+                  width: isActive ? 28 : 22,
+                  height: isActive ? 28 : 22,
+                  decoration: BoxDecoration(
+                    color: kThemes[i].chipColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isActive
+                          ? (_theme.brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black)
+                          : Colors.transparent,
+                      width: isActive ? 2.5 : 0,
+                    ),
+                    boxShadow: isActive
+                        ? [
+                            BoxShadow(
+                              color: kThemes[i].chipColor.withOpacity(0.5),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            )
+                          ]
+                        : null,
+                  ),
+                ),
+              );
+            }),
+          ],
         ),
       ),
     );
@@ -767,10 +1031,12 @@ class GeometricAccentPainter extends CustomPainter {
       ..color = color.withOpacity(0.05)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
-    for (double i = 0; i < size.width; i += 100)
+    for (double i = 0; i < size.width; i += 100) {
       canvas.drawLine(Offset(i, 0), Offset(i, size.height), dashPaint);
-    for (double i = 0; i < size.height; i += 100)
+    }
+    for (double i = 0; i < size.height; i += 100) {
       canvas.drawLine(Offset(0, i), Offset(size.width, i), dashPaint);
+    }
     canvas.drawLine(
         Offset(size.width * 0.7, 40), Offset(size.width * 0.95, 40), paint);
     canvas.drawLine(
@@ -779,8 +1045,9 @@ class GeometricAccentPainter extends CustomPainter {
     canvas.drawCircle(Offset(size.width * 0.9, size.height * 0.8), 40, paint);
     canvas.drawLine(
         Offset(40, size.height * 0.2), Offset(40, size.height * 0.8), paint);
-    for (double j = size.height * 0.2; j < size.height * 0.8; j += 40)
+    for (double j = size.height * 0.2; j < size.height * 0.8; j += 40) {
       canvas.drawLine(Offset(40, j), Offset(55, j), paint);
+    }
     canvas.drawArc(Rect.fromLTWH(size.width * 0.7, size.height * 0.1, 400, 400),
         0, 1.5, false, paint);
     final diamondPath = Path()
@@ -809,9 +1076,9 @@ class WeatherPainter extends CustomPainter {
       ..strokeWidth = 1.0
       ..style = PaintingStyle.fill;
     final double time = DateTime.now().millisecondsSinceEpoch / 1000.0;
-    if (type == 'rain')
+    if (type == 'rain') {
       _drawRain(canvas, size, paint, time);
-    else if (type == 'snow')
+    } else if (type == 'snow')
       _drawSnow(canvas, size, paint, time);
     else if (type == 'haze') _drawHaze(canvas, size, paint, time);
   }

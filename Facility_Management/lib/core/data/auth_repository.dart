@@ -10,41 +10,25 @@ class AuthRepository {
   // Base URL provided by user
   final String baseUrl = 'https://abundantly-unsaturated-hayes.ngrok-free.dev/api';
 
-  // --- Auth Methods ---
-
+  // --- Auth Methods (MOCKED FOR LOCAL DEVELOPMENT) ---
+  
   Future<Map<String, dynamic>> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/auth/login');
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
+    print('FCM: Logging in (MOCK)...');
+    // Simulate a short delay for realism
+    await Future.delayed(const Duration(milliseconds: 500));
+    
+    final mockData = {
+      'token': 'mock_token_123',
+      'userId': 'mock_user_id_456',
+      'name': 'FCM ADMIN',
+      'role': 'legal', // Force legal role for dashboard
+    };
 
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        // Save token and userId
-        final prefs = await SharedPreferences.getInstance();
-        if (data['token'] != null) {
-          await prefs.setString('auth_token', data['token']);
-        }
-        if (data['userId'] != null) {
-          await prefs.setString('user_id', data['userId']);
-        }
-        return {'success': true, 'data': data};
-      } else {
-        return {'success': false, 'error': data['error'] ?? 'Login failed'};
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Network error: $e'};
-    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('auth_token', mockData['token']!);
+    await prefs.setString('user_id', mockData['userId']!);
+    
+    return {'success': true, 'data': mockData};
   }
 
   Future<Map<String, dynamic>> register({
@@ -54,61 +38,11 @@ class AuthRepository {
     required String phone,
     required String houseId,
   }) async {
-    final url = Uri.parse('$baseUrl/auth/register');
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-        },
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-          'name': name,
-          'phone': phone,
-          'houseId': houseId,
-          'role': 'resident', // Default role
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'success': true, 'data': data};
-      } else {
-        return {'success': false, 'error': data['error'] ?? 'Registration failed'};
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Network error: $e'};
-    }
+    return {'success': true, 'data': {'userId': 'mock_user_id'}};
   }
 
   Future<Map<String, dynamic>> setPin(String userId, String pin) async {
-    final url = Uri.parse('$baseUrl/auth/pin');
-    try {
-      final response = await http.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true',
-        },
-        body: jsonEncode({
-          'userId': userId,
-          'pin': pin,
-        }),
-      );
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {'success': true, 'data': data};
-      } else {
-        return {'success': false, 'error': data['error'] ?? 'Failed to set PIN'};
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Network error: $e'};
-    }
+    return {'success': true, 'data': {'status': 'PIN Set'}};
   }
 
   Future<void> logout() async {
@@ -127,47 +61,17 @@ class AuthRepository {
     return prefs.getString('auth_token');
   }
 
-  // Get current user profile using session token
+  // Get current user profile (MOCKED)
   Future<Map<String, dynamic>> getProfile() async {
-    print('FCM: Fetching profile...');
-    final token = await getToken();
-    if (token == null) {
-      print('FCM Error: No token found in local storage.');
-      return {'success': false, 'error': 'No token found'};
-    }
-
-    final url = Uri.parse('$baseUrl/auth/me');
-    print('FCM: Requesting GET $url');
-    try {
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-          'ngrok-skip-browser-warning': 'true',
-        },
-      );
-
-      print('FCM: Response Status -> ${response.statusCode}');
-      print('FCM: Response Body -> ${response.body}');
-
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        print('FCM Success: Profile loaded for user: ${data['name']}');
-        return {'success': true, 'data': data};
-      } else if (response.statusCode == 401) {
-        print('FCM Warning: Session Expired (401). Clearing token...');
-        // Session Expired logic (from v0.2.3_xx instructions)
-        await logout();
-        return {'success': false, 'error': 'Session Expired', 'expired': true};
-      } else {
-        print('FCM Error: Failed with message -> ${data['error']}');
-        return {'success': false, 'error': data['error'] ?? 'Failed to get profile'};
+    print('FCM: Fetching profile (MOCK)...');
+    return {
+      'success': true, 
+      'data': {
+        'id': 'mock_user_id_456',
+        'name': 'FCM ADMIN',
+        'email': 'admin@fcm.com',
+        'role': 'legal',
       }
-    } catch (e) {
-      print('FCM Exception: $e');
-      return {'success': false, 'error': 'Network error: $e'};
-    }
+    };
   }
 }

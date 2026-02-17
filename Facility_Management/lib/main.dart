@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/auth/presentation/screens/register_screen.dart';
 import 'features/resident/presentation/screens/repair_list_screen.dart';
-// import 'features/resident/presentation/screens/create_repair_screen.dart'; // REMOVED
-import 'features/resident/presentation/screens/model_view_screen.dart'; // Import
+import 'features/resident/presentation/screens/model_view_screen.dart';
 import 'features/legal/presentation/screens/legal_dashboard_screen.dart';
 
 import 'package:fcm_app/core/data/auth_repository.dart';
@@ -11,7 +10,8 @@ import 'package:fcm_app/core/data/auth_repository.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final isLoggedIn = await AuthRepository.instance.isLoggedIn();
-  runApp(FcmApp(initialRoute: '/legal')); // Changed to /legal for testing
+  // Using isLoggedIn to determine initial route if possible, but default to /login
+  runApp(FcmApp(initialRoute: isLoggedIn ? '/legal' : '/login'));
 }
 
 class FcmApp extends StatelessWidget {
@@ -57,7 +57,14 @@ class FcmApp extends StatelessWidget {
           prefixIconColor: Color(0xFFFFD700),
         ),
       ),
-      home: const LegalDashboardScreen(), // FORCED HOME
+      initialRoute: initialRoute,
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/legal': (context) => const LegalDashboardScreen(),
+        '/repair_list': (context) => const RepairListScreen(),
+        '/3d_model': (context) => const ModelViewScreen(),
+      },
     );
   }
 }

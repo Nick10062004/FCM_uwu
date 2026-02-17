@@ -69,6 +69,14 @@ flutter:
     - assets/models/
     - assets/skybox.png
     - assets/skybox.exr
+    - assets/village_map.jpg
+    - assets/jib_air.jpg
+    - assets/wichai_electric.jpg
+    - assets/kong_plumbing.jpg
+    - assets/jack_senior.jpg
+    - assets/grace_paint.jpg
+    - assets/prism_it.jpg
+    - assets/coupe_maint.jpg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
