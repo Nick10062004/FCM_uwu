@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/data/dashboard_data.dart';
+import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_theme.dart';
 
 class VillageMapWidget extends StatefulWidget {
   final Function(String house, String issue)? onMarkerTap;
@@ -33,19 +35,23 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF0A0A0A),
+        color: Colors.transparent,
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
+      child: ValueListenableBuilder<bool>(
+        valueListenable: DashboardTheme.isDarkMode,
+        builder: (context, isDark, child) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
               // Real Village Map Asset
               Positioned.fill(
                 child: Image.asset(
                   'assets/village_map.jpg',
                   fit: BoxFit.cover,
-                  // Removed darkening filters to restore original map clarity
+                  color: Colors.black.withOpacity(isDark ? 0.3 : 0.0), // Darken only in Dark Mode
+                  colorBlendMode: BlendMode.darken,
                 ),
               ),
 
@@ -53,7 +59,7 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
               Positioned.fill(
                 child: IgnorePointer(
                   child: Opacity(
-                    opacity: 0.08,
+                    opacity: 0.1,
                     child: RepaintBoundary(
                       child: CustomPaint(
                         painter: GridPainter(),
@@ -86,99 +92,29 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
                 ),
               ),
 
-              // Tech Markers / Repair Requests
-              Positioned(
-                top: constraints.maxHeight * 0.22,
-                left: constraints.maxWidth * 0.22,
-                child: _buildMarkerWidget(
-                  icon: Icons.water_drop,
-                  color: const Color(0xFFFF9900), // Bright Orange
-                  house: 'B12',
-                  issue: 'Leak Pipe',
-                ),
-              ),
-              Positioned(
-                top: constraints.maxHeight * 0.55,
-                left: constraints.maxWidth * 0.45,
-                child: _buildMarkerWidget(
-                  icon: Icons.electric_bolt,
-                  color: const Color(0xFFFF3333), // Vivid Red
-                  house: 'A05',
-                  issue: 'Power Outage',
-                ),
-              ),
-              Positioned(
-                top: constraints.maxHeight * 0.35,
-                left: constraints.maxWidth * 0.65,
-                child: _buildMarkerWidget(
-                  icon: Icons.build,
-                  color: const Color(0xFFFFD700),
-                  house: 'C08',
-                  issue: 'Broken Faucet',
-                ),
-              ),
-              Positioned(
-                top: constraints.maxHeight * 0.70,
-                left: constraints.maxWidth * 0.15,
-                child: _buildMarkerWidget(
-                  icon: Icons.roofing,
-                  color: const Color(0xFF00BFFF),
-                  house: 'D03',
-                  issue: 'Roof Leak',
-                ),
-              ),
-              Positioned(
-                top: constraints.maxHeight * 0.40,
-                left: constraints.maxWidth * 0.78,
-                child: _buildMarkerWidget(
-                  icon: Icons.ac_unit,
-                  color: const Color(0xFF00FFCC), // Neon Cyan
-                  house: 'E11',
-                  issue: 'AC Failure',
-                ),
-              ),
 
-              // Bottom vignette
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: 120,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        const Color(0xFF0A0A0A).withOpacity(0.4), // Reduced from 0.95
-                      ],
-                    ),
+              // Dynamic Issue Markers from DashboardData
+              ...DashboardData.tasks.where((task) {
+                // Show markers ONLY for RESIDENTIAL UNITS (UNIT-*) that are PENDING or URGENT
+                final String house = task['house']?.toString() ?? "";
+                return house.startsWith('UNIT-') && 
+                       DashboardData.houseMarkerPositions.containsKey(house) && 
+                       (task['status'] == "PENDING" || task['status'] == "URGENT");
+              }).map((task) {
+                final Offset pos = DashboardData.houseMarkerPositions[task['house']]!;
+                return Positioned(
+                  top: constraints.maxHeight * pos.dy,
+                  left: constraints.maxWidth * pos.dx,
+                  child: _buildMarkerWidget(
+                    icon: (task['icon'] is IconData) ? task['icon'] as IconData : Icons.warning_rounded,
+                    color: task['status'] == 'URGENT' ? DashboardTheme.error : DashboardTheme.primary,
+                    house: (task['house'] as String).replaceFirst('UNIT-', ''),
+                    issue: (task['title'] as String).length > 15 
+                      ? (task['title'] as String).substring(0, 15) + "..."
+                      : task['title'] as String,
                   ),
-                ),
-              ),
-
-              // Top vignette
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 80,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.transparent,
-                        const Color(0xFF0A0A0A).withOpacity(0.3), // Reduced from 0.7
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Redundant header removed - now managed by legal_dashboard_screen.dart
+                );
+              }),
 
               // Bottom status bar overlay
               Positioned(
@@ -188,22 +124,59 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _hudBadge("Repair Points", "5", Colors.orange),
-                        const SizedBox(width: 16),
-                        _hudBadge("Urgent", "2", Colors.red),
-                        const SizedBox(width: 16),
-                        _hudBadge("In Progress", "3", const Color(0xFF00FF9F)),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
+                          child: Text(
+                            "RESIDENT TASKS",
+                            style: GoogleFonts.shareTechMono(
+                              color: Colors.white,
+                              fontSize: 10,
+                              letterSpacing: 1.2,
+                              fontWeight: FontWeight.bold,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withOpacity(0.8),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            _hudBadge(
+                              "Pending", 
+                              DashboardData.tasks.where((t) => t['status'] == 'PENDING' && t['house'].toString().startsWith('UNIT-')).length.toString(), 
+                              DashboardTheme.primary
+                            ),
+                            const SizedBox(width: 16),
+                            _hudBadge(
+                              "Urgent", 
+                              DashboardData.tasks.where((t) => t['status'] == 'URGENT' && t['house'].toString().startsWith('UNIT-')).length.toString(), 
+                              DashboardTheme.error
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     Text(
-                      "ZONE A-E  ·  SECTOR OVERVIEW",
+                      "VIVORN Village  ·  SECTOR OVERVIEW",
                       style: GoogleFonts.notoSans(
-                        color: Colors.white24,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
                         letterSpacing: 1.5,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.8),
+                            blurRadius: 8,
+                            offset: const Offset(0, 1),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -212,39 +185,44 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
             ],
           );
         },
-      ),
-    );
+      );
+    },
+  ),
+);
   }
 
   Widget _hudBadge(String label, String count, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Row(
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
           ),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          "$label ",
-          style: GoogleFonts.notoSans(
-            color: Colors.white54,
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
+          const SizedBox(width: 6),
+          Text(
+            "$label ",
+            style: GoogleFonts.notoSans(
+              color: DashboardTheme.textSecondary,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        Text(
-          count,
-          style: GoogleFonts.notoSans(
-            color: color,
-            fontSize: 10,
-            fontWeight: FontWeight.w900,
+          Text(
+            count,
+            style: GoogleFonts.notoSans(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -293,9 +271,10 @@ class _PulsingMarkerState extends State<_PulsingMarker>
   @override
   void initState() {
     super.initState();
+    final isUrgent = widget.color == DashboardTheme.error;
     _pulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: isUrgent ? 800 : 1500),
     )..repeat(reverse: true);
   }
 
@@ -331,7 +310,7 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.85), // Solid dark background for contrast
+                      color: DashboardTheme.isDarkMode.value ? DashboardTheme.surface : Colors.white, // Dark marker in Dark Mode
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: widget.color, 
@@ -339,8 +318,8 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: widget.color.withOpacity(0.5 + pulseValue * 0.3),
-                          blurRadius: 10 + (pulseValue * 6), // Sharper glow
+                          color: widget.color.withOpacity(0.2 + pulseValue * 0.2),
+                          blurRadius: 8 + (pulseValue * 4), 
                           spreadRadius: 1 + (pulseValue * 1),
                         ),
                       ],
@@ -348,7 +327,7 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                     child: Icon(
                       widget.icon, 
                       color: widget.color, 
-                      size: 16, // Balanced size
+                      size: widget.color == DashboardTheme.error ? 20 : 16, 
                     ),
                   ),
                 ),
@@ -367,19 +346,21 @@ class _PulsingMarkerState extends State<_PulsingMarker>
               ],
             ),
             const SizedBox(width: 6),
-            // Glass label - High Contrast
+              // Glass label - High Contrast
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.9),
+                color: DashboardTheme.isDarkMode.value 
+                    ? Colors.black.withOpacity(0.8) 
+                    : Colors.white.withOpacity(0.9),
                 border: Border.all(
-                  color: widget.color.withOpacity(0.8),
+                  color: widget.color.withOpacity(0.5),
                   width: 1.5,
                 ),
                 borderRadius: BorderRadius.circular(6),
                 boxShadow: [
                   BoxShadow(
-                    color: widget.color.withOpacity(0.2),
+                    color: Colors.black.withOpacity(0.2),
                     blurRadius: 12,
                     spreadRadius: 2,
                   ),
@@ -390,11 +371,11 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'UNIT: ${widget.house}',
+                    widget.color == DashboardTheme.error ? '🚨 URGENT: ${widget.house}' : 'H: ${widget.house}',
                     style: GoogleFonts.shareTechMono(
                       color: widget.color,
                       fontWeight: FontWeight.w900,
-                      fontSize: 11,
+                      fontSize: 12,
                       letterSpacing: 1.0,
                     ),
                   ),
@@ -402,7 +383,7 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                   Text(
                     widget.issue.toUpperCase(),
                     style: GoogleFonts.shareTechMono(
-                      color: Colors.white,
+                      color: DashboardTheme.textMain,
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.5,
@@ -423,7 +404,7 @@ class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFC5A059).withOpacity(0.08)
+      ..color = DashboardTheme.primary.withOpacity(0.12)
       ..strokeWidth = 0.5;
 
     const spacing = 50.0;
@@ -453,9 +434,9 @@ class ScanLinePainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: [
           Colors.transparent,
-          const Color(0xFF00FF9F).withOpacity(0.06),
-          const Color(0xFF00FF9F).withOpacity(0.12),
-          const Color(0xFF00FF9F).withOpacity(0.06),
+          DashboardTheme.primary.withOpacity(0.06),
+          DashboardTheme.primary.withOpacity(0.12),
+          DashboardTheme.primary.withOpacity(0.06),
           Colors.transparent,
         ],
       ).createShader(Rect.fromLTWH(0, y - 40, size.width, 80));
@@ -464,7 +445,7 @@ class ScanLinePainter extends CustomPainter {
 
     // Thin bright line
     final linePaint = Paint()
-      ..color = const Color(0xFF00FF9F).withOpacity(0.3)
+      ..color = DashboardTheme.primary.withOpacity(0.3)
       ..strokeWidth = 1.0;
     canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
   }
@@ -478,7 +459,7 @@ class HudCornerPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFC5A059).withOpacity(0.4)
+      ..color = DashboardTheme.primary.withOpacity(0.4)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
 
