@@ -555,10 +555,11 @@ class CustomSidebar extends StatelessWidget {
                     final updated = RepairRequest(
                         id: item.id,
                         title: editDescController.text,
+                        description: item.description,
                         date: "${editDate.day}/${editDate.month}/${editDate.year + 543}",
                         status: item.status,
                         statusColor: item.statusColor,
-                        imagePath: item.imagePath,
+                        imagePaths: item.imagePaths,
                     );
                     RepairRepository.instance.updateRequest(updated);
                     Navigator.pop(context);

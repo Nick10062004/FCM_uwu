@@ -7,6 +7,7 @@ import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widg
 import 'package:fcm_app/features/legal/presentation/widgets/technician_card.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/personnel_dossier_overlay.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/task_assignment_overlay.dart';
+import 'package:fcm_app/core/data/repair_repository.dart';
 import 'dart:async';
 
 
@@ -24,11 +25,16 @@ class TasksView extends StatefulWidget {
   State<TasksView> createState() => _TasksViewState();
 }
 
+enum RegistryTab { staffs, teams }
+
 class _TasksViewState extends State<TasksView> {
   String _taskFilter = "ALL";
   Map<String, dynamic>? _selectedTask;
   Map<String, dynamic>? _selectedTech;
   List<String> _draftStaffNames = [];
+  
+  // Personnel Registry Selection Mode
+  RegistryTab _personnelRegistryTab = RegistryTab.staffs;
   
   late Timer _urgentTimer;
   int _urgentIndex = 0;
@@ -377,9 +383,11 @@ class _TasksViewState extends State<TasksView> {
                           ],
                         ),
                       ),
+                      const Spacer(),
                       ],
                     ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
+
                   _buildTableHeader(),
                   Expanded(
                     child: ListView.separated(
@@ -433,19 +441,49 @@ class _TasksViewState extends State<TasksView> {
               ),
             ),
 
-          // 3. TECHNICIAN ROW (BOTTOM DOCK)
+          // ── Staff Dock (only visible during assignment) ──
           Positioned(
             bottom: 40,
             left: 0,
             right: 0,
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
-              opacity: _selectedTask != null || _selectedTech != null ? 1.0 : 0.0,
+              opacity: _selectedTask != null ? 1.0 : 0.0,
               child: IgnorePointer(
-                ignoring: _selectedTask == null && _selectedTech == null,
+                ignoring: _selectedTask == null,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // ── DOCK TABS ──
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      decoration: BoxDecoration(
+                        color: DashboardTheme.background,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: DashboardTheme.border),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ValueListenableBuilder<List<TeamPreset>>(
+                            valueListenable: RepairRepository.instance.teamPresetsNotifier,
+                            builder: (context, presets, _) {
+                              return Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildModernDockTab("บุคลากร", "${DashboardData.technicians.length}", _personnelRegistryTab == RegistryTab.staffs, () => setState(() => _personnelRegistryTab = RegistryTab.staffs)),
+                                  _buildModernDockTab("ทีม", "${presets.length}", _personnelRegistryTab == RegistryTab.teams, () => setState(() => _personnelRegistryTab = RegistryTab.teams)),
+                                ],
+                              );
+                            }
+                          ),
+                        ],
+                      ),
+                    ),
                     SizedBox(
                       height: 210,
                       child: SingleChildScrollView(
@@ -453,32 +491,86 @@ class _TasksViewState extends State<TasksView> {
                         physics: const BouncingScrollPhysics(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: DashboardData.technicians.map((tech) {
-                            return TechnicianCard(
-                              name: tech['name'],
-                              status: tech['isActive'] ? "ACTIVE" : "INACTIVE",
-                              statusColor: tech['isActive'] ? DashboardTheme.success : DashboardTheme.accentAmber,
-                              isActive: tech['isActive'],
-                              imagePath: tech['image'],
-                              roleIcon: tech['icon'],
-                              role: tech['role'],
-                              onTap: () {
-                                if (_selectedTask != null) {
-                                  if (tech['isActive']) {
-                                    setState(() {
-                                      if (_draftStaffNames.contains(tech['name'])) {
-                                        _draftStaffNames.remove(tech['name']);
-                                      } else {
-                                        _draftStaffNames.add(tech['name']);
-                                      }
-                                    });
+                          children: _personnelRegistryTab == RegistryTab.staffs 
+                            ? (DashboardData.technicians.map<Widget>((tech) {
+                                return TechnicianCard(
+                                  name: tech['name'],
+                                  status: tech['isActive'] ? "ACTIVE" : "INACTIVE",
+                                  statusColor: tech['isActive'] ? DashboardTheme.success : DashboardTheme.accentAmber,
+                                  isActive: tech['isActive'],
+                                  isSelected: _draftStaffNames.contains(tech['name']),
+                                  imagePath: tech['image'],
+                                  roleIcon: tech['icon'],
+                                  role: tech['role'],
+                                  onTap: () {
+                                    if (_selectedTask != null && tech['isActive']) {
+                                      setState(() {
+                                        if (_draftStaffNames.contains(tech['name'])) {
+                                          _draftStaffNames.remove(tech['name']);
+                                        } else {
+                                          _draftStaffNames.add(tech['name']);
+                                        }
+                                      });
+                                    }
+                                  },
+                                );
+                              }).toList())
+                            : <Widget>[ValueListenableBuilder<List<TeamPreset>>(
+                                valueListenable: RepairRepository.instance.teamPresetsNotifier,
+                                builder: (context, presets, _) {
+                                  if (presets.isEmpty) {
+                                    return Center(child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                                      child: Text("ยังไม่มีข้อมูลทีม", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontSize: 13)),
+                                    ));
                                   }
-                                } else {
-                                  setState(() => _selectedTech = tech);
-                                }
-                              },
-                            );
-                          }).toList(),
+                                  return Row(
+                                    children: presets.map((preset) {
+                                      final bool allSelected = _selectedTask != null && preset.memberNames.every((n) => _draftStaffNames.contains(n));
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        child: InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              if (allSelected) {
+                                                _draftStaffNames.removeWhere((n) => preset.memberNames.contains(n));
+                                              } else {
+                                                for (final name in preset.memberNames) {
+                                                  if (!_draftStaffNames.contains(name)) _draftStaffNames.add(name);
+                                                }
+                                              }
+                                            });
+                                          },
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: AnimatedContainer(
+                                            duration: const Duration(milliseconds: 200),
+                                            width: 180,
+                                            padding: const EdgeInsets.all(20),
+                                            decoration: BoxDecoration(
+                                              color: DashboardTheme.surface,
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(color: allSelected ? const Color(0xFF00E676) : DashboardTheme.border, width: 2),
+                                              boxShadow: [
+                                                BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 10, offset: const Offset(0, 4)),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(preset.icon, color: allSelected ? const Color(0xFF00E676) : DashboardTheme.primary, size: 28),
+                                                const SizedBox(height: 12),
+                                                Text(preset.name, style: GoogleFonts.notoSans(color: allSelected ? const Color(0xFF00E676) : DashboardTheme.textMain, fontSize: 15, fontWeight: FontWeight.w900)),
+                                                const SizedBox(height: 6),
+                                                Text("${preset.memberNames.length} Members", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontSize: 11)),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                },
+                              )],
                         ),
                       ),
                     ),
@@ -492,13 +584,13 @@ class _TasksViewState extends State<TasksView> {
     );
   }
 
-  Widget _buildModernTab(String label, String count, bool isActive, VoidCallback onTap) {
+  Widget _buildModernDockTab(String label, String count, bool isActive, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive ? DashboardTheme.primary.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
@@ -518,13 +610,57 @@ class _TasksViewState extends State<TasksView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: isActive ? DashboardTheme.primary.withOpacity(0.1) : DashboardTheme.border,
+                color: isActive ? DashboardTheme.primary : DashboardTheme.surfaceSecondary,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: Text(
                 count,
                 style: GoogleFonts.shareTechMono(
-                  color: isActive ? DashboardTheme.primary : DashboardTheme.textPale,
+                  color: isActive ? Colors.black : DashboardTheme.textPale,
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernTab(String label, String count, bool isActive, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? DashboardTheme.primary.withOpacity(0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: isActive ? DashboardTheme.primary.withOpacity(0.3) : Colors.transparent),
+        ),
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: GoogleFonts.notoSans(
+                color: isActive ? DashboardTheme.primary : DashboardTheme.textPale,
+                fontSize: 13,
+                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: isActive ? DashboardTheme.primary : DashboardTheme.surfaceSecondary,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                count,
+                style: GoogleFonts.shareTechMono(
+                  color: isActive ? Colors.black : DashboardTheme.textPale,
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
@@ -696,6 +832,151 @@ class _TasksViewState extends State<TasksView> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // ── Team Preset Dialogs ──
+
+  void _showPresetMembersDialog(TeamPreset preset) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: DashboardTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(preset.icon, color: DashboardTheme.primary, size: 22),
+            const SizedBox(width: 10),
+            Text(preset.name, style: GoogleFonts.notoSans(color: DashboardTheme.textMain, fontSize: 18, fontWeight: FontWeight.w900)),
+            const Spacer(),
+            IconButton(
+              icon: Icon(Icons.delete_outline_rounded, color: DashboardTheme.error.withOpacity(0.6), size: 20),
+              onPressed: () {
+                Navigator.pop(ctx);
+                _showDeletePresetDialog(preset);
+              },
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: 300,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("สมาชิก ${preset.memberNames.length} คน", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontSize: 12)),
+              const SizedBox(height: 12),
+              ...preset.memberNames.map((name) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Icon(Icons.person_rounded, color: DashboardTheme.primary, size: 18),
+                    const SizedBox(width: 10),
+                    Text(name, style: GoogleFonts.notoSans(color: DashboardTheme.textMain, fontSize: 14, fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              )),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text("ปิด", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSavePresetDialog() {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: DashboardTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Icons.folder_special_rounded, color: DashboardTheme.primary, size: 24),
+            const SizedBox(width: 12),
+            Text("SAVE TEAM PRESET", style: GoogleFonts.notoSans(color: DashboardTheme.textMain, fontSize: 16, fontWeight: FontWeight.w900)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("Members: ${_draftStaffNames.join(', ')}", style: GoogleFonts.notoSans(color: DashboardTheme.textSecondary, fontSize: 12)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              style: GoogleFonts.notoSans(color: DashboardTheme.textMain, fontSize: 14),
+              decoration: InputDecoration(
+                hintText: "Team name...",
+                hintStyle: GoogleFonts.notoSans(color: DashboardTheme.textPale),
+                filled: true,
+                fillColor: DashboardTheme.surfaceSecondary,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: DashboardTheme.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: DashboardTheme.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: DashboardTheme.primary)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text("CANCEL", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                RepairRepository.instance.addTeamPreset(
+                  name: controller.text.trim(),
+                  memberNames: List.from(_draftStaffNames),
+                );
+                Navigator.pop(ctx);
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DashboardTheme.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text("SAVE", style: GoogleFonts.notoSans(color: Colors.white, fontWeight: FontWeight.w900)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeletePresetDialog(TeamPreset preset) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: DashboardTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text("DELETE PRESET?", style: GoogleFonts.notoSans(color: DashboardTheme.error, fontSize: 16, fontWeight: FontWeight.w900)),
+        content: Text("Remove team preset \"${preset.name}\"?", style: GoogleFonts.notoSans(color: DashboardTheme.textSecondary, fontSize: 13)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text("CANCEL", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              RepairRepository.instance.deleteTeamPreset(preset.id);
+              Navigator.pop(ctx);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DashboardTheme.error,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text("DELETE", style: GoogleFonts.notoSans(color: Colors.white, fontWeight: FontWeight.w900)),
+          ),
+        ],
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show File;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_ui_utils.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_painters.dart';
@@ -60,7 +62,11 @@ class PersonnelDossierOverlay extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(24),
                                 border: Border.all(color: DashboardTheme.primary.withOpacity(0.3), width: 2),
                                 image: DecorationImage(
-                                  image: AssetImage(technician['image'] as String),
+                                  image: (technician['image'] as String).startsWith('assets/')
+                                      ? AssetImage(technician['image'] as String) as ImageProvider
+                                      : (kIsWeb 
+                                          ? NetworkImage(technician['image'] as String)
+                                          : FileImage(File(technician['image'] as String))),
                                   fit: BoxFit.cover,
                                 ),
                               ),

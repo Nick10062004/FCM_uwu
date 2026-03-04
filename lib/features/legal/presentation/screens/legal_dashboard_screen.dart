@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_theme.dart';
@@ -26,8 +27,49 @@ class LegalDashboardScreen extends StatefulWidget {
   State<LegalDashboardScreen> createState() => _LegalDashboardScreenState();
 }
 
-class _LegalDashboardScreenState extends State<LegalDashboardScreen> {
+class _LegalDashboardScreenState extends State<LegalDashboardScreen>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
+
+  // ── Sidebar auto-hide ──
+  late AnimationController _sidebarAnim;
+  Timer? _hideTimer;
+  bool _isHovering = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _sidebarAnim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+      value: 1.0,
+    );
+    _startHideTimer();
+  }
+
+  @override
+  void dispose() {
+    _hideTimer?.cancel();
+    _sidebarAnim.dispose();
+    super.dispose();
+  }
+
+  void _startHideTimer() {
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(seconds: 10), () {
+      if (!_isHovering && mounted) {
+        _sidebarAnim.animateTo(0.0, curve: Curves.easeInOutCubic);
+      }
+    });
+  }
+
+  void _showSidebar() {
+    _hideTimer?.cancel();
+    if (mounted) _sidebarAnim.animateTo(1.0, curve: Curves.easeOutCubic);
+  }
+
+  void _onSidebarHoverEnter() { _isHovering = true; _showSidebar(); }
+  void _onSidebarHoverExit() { _isHovering = false; _startHideTimer(); }
 
   @override
   Widget build(BuildContext context) {
@@ -36,29 +78,74 @@ class _LegalDashboardScreenState extends State<LegalDashboardScreen> {
       builder: (context, isDark, child) {
         return Scaffold(
           backgroundColor: DashboardTheme.background,
-          body: Row(
+          body: Stack(
             children: [
-              HoverSidebar(
-                selectedIndex: _selectedIndex,
-                onIndexChanged: (i) => setState(() => _selectedIndex = i),
-                onLogout: () => _showLogoutConfirmation(context),
+              Row(
+                children: [
+                  // Animated sidebar
+                  AnimatedBuilder(
+                    animation: _sidebarAnim,
+                    builder: (context, child) {
+                      final value = _sidebarAnim.value;
+                      if (value == 0.0) return const SizedBox.shrink();
+                      return ClipRect(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          widthFactor: value,
+                          child: Opacity(
+                            opacity: value.clamp(0.0, 1.0),
+                            child: child,
+                          ),
+                        ),
+                      );
+                    },
+                    child: RepaintBoundary(
+                      child: MouseRegion(
+                        onEnter: (_) => _onSidebarHoverEnter(),
+                        onExit: (_) => _onSidebarHoverExit(),
+                        child: HoverSidebar(
+                          selectedIndex: _selectedIndex,
+                          onIndexChanged: (i) {
+                            setState(() => _selectedIndex = i);
+                            _startHideTimer();
+                          },
+                          onLogout: () => _showLogoutConfirmation(context),
+                          items: const [
+                            SidebarItem(index: 0, icon: Icons.dashboard_rounded, label: "OVERVIEW"),
+                            SidebarItem(index: 1, icon: Icons.assignment_rounded, label: "REQUESTS"),
+                            SidebarItem(index: 2, icon: Icons.engineering_rounded, label: "STAFF"),
+                            SidebarItem(index: 4, icon: Icons.analytics_rounded, label: "ANALYTICS"),
+                            SidebarItem(index: 5, icon: Icons.person_rounded, label: "ACCOUNT"),
+                            SidebarItem(index: 3, icon: Icons.settings_rounded, label: "SETTINGS"),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: RepaintBoundary(
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: _buildMainContent(),
+                          ),
+                          Positioned(
+                            top: 0, left: 0, right: 0,
+                            child: _buildHeader(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: Stack(
-                  children: [
-                    // 1. The main content (Map/Views) takes the FULL available area
-                    Positioned.fill(
-                      child: _buildMainContent(),
-                    ),
-                    
-                    // 2. The Header floats ON TOP of the content
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: _buildHeader(),
-                    ),
-                  ],
+              // Left edge hover zone
+              Positioned(
+                top: 0, left: 0, bottom: 0, width: 16,
+                child: MouseRegion(
+                  opaque: false,
+                  onEnter: (_) => _onSidebarHoverEnter(),
+                  child: const SizedBox.expand(),
                 ),
               ),
             ],
@@ -288,7 +375,13 @@ class _LegalDashboardScreenState extends State<LegalDashboardScreen> {
       case 4:
         return const StatisticsView();
       case 5:
-        return const ProfileView();
+        return ProfileView(
+          name: "Admin Zeta",
+          email: "admin@gmail.com",
+          phone: "+66 88 777 9999",
+          role: "Admin",
+          imagePath: 'assets/images/profile_placeholder_2.jpg',
+        );
       default:
         return const OverviewView();
     }

@@ -2,16 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_theme.dart';
 
+class SidebarItem {
+  final int index;
+  final IconData icon;
+  final String label;
+
+  const SidebarItem({
+    required this.index,
+    required this.icon,
+    required this.label,
+  });
+}
+
 class HoverSidebar extends StatefulWidget {
   final int selectedIndex;
   final ValueChanged<int> onIndexChanged;
   final VoidCallback onLogout;
+  final List<SidebarItem> items;
+  final String brandTitle;
+  final String brandSubtitle;
 
   const HoverSidebar({
     super.key,
     required this.selectedIndex,
     required this.onIndexChanged,
     required this.onLogout,
+    required this.items,
+    this.brandTitle = "FCM PLATFORM",
+    this.brandSubtitle = "ENTERPRISE QUALITY MANAGEMENT",
   });
 
   @override
@@ -95,7 +113,7 @@ class _HoverSidebarState extends State<HoverSidebar> with SingleTickerProviderSt
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                "FCM PLATFORM",
+                                widget.brandTitle,
                                 style: GoogleFonts.outfit(
                                   color: DashboardTheme.textMain,
                                   fontWeight: FontWeight.w900,
@@ -106,7 +124,7 @@ class _HoverSidebarState extends State<HoverSidebar> with SingleTickerProviderSt
                                 overflow: TextOverflow.clip,
                               ),
                               Text(
-                                "ENTERPRISE QUALITY MANAGEMENT",
+                                widget.brandSubtitle,
                                 style: GoogleFonts.notoSans(
                                   color: DashboardTheme.textSecondary,
                                   fontSize: 7,
@@ -125,12 +143,12 @@ class _HoverSidebarState extends State<HoverSidebar> with SingleTickerProviderSt
                 ),
               ),
                 const SizedBox(height: 60),
-                _navItem(0, Icons.dashboard_rounded, "OVERVIEW", expansion),
-                _navItem(1, Icons.assignment_rounded, "REQUESTS", expansion),
-                _navItem(2, Icons.engineering_rounded, "STAFF", expansion),
-                _navItem(4, Icons.analytics_rounded, "ANALYTICS", expansion),
-                _navItem(5, Icons.person_rounded, "ACCOUNT", expansion),
-                _navItem(3, Icons.settings_rounded, "SETTINGS", expansion),
+                ...widget.items.map((item) => _navItem(
+                      item.index,
+                      item.icon,
+                      item.label,
+                      expansion,
+                    )),
                 const Spacer(),
                 const SizedBox(height: 8),
                 Padding(

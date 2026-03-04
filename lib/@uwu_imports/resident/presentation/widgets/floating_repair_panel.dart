@@ -44,7 +44,7 @@ class _FloatingRepairPanelState extends State<FloatingRepairPanel> {
 
     // Add each item to RepairRepository
     for (var item in widget.pendingItems) {
-      RepairRepository.instance.addRequest(item.name, item.imagePath);
+      RepairRepository.instance.addRequest(title: item.name, description: item.name, imagePaths: item.imagePath != null ? [item.imagePath!] : []);
     }
 
     widget.onSubmit();

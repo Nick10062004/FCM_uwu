@@ -11,6 +11,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _idCardController = TextEditingController(); // SRS: 13-digit National ID
   final _houseIdController = TextEditingController(); // House ID (New Required)
   final _nameController = TextEditingController(); // Full Name
   final _phoneController = TextEditingController(); // Phone Number
@@ -20,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    _idCardController.dispose();
     _houseIdController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
@@ -250,7 +252,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 30),
 
-            // House ID Field (New Required)
+            // SRS: 13-digit National ID Card
+            TextFormField(
+              controller: _idCardController,
+              style: GoogleFonts.kanit(color: Colors.white),
+              cursorColor: const Color(0xFFC5A059),
+              keyboardType: TextInputType.number,
+              maxLength: 13,
+              decoration: _inputDecoration('เลขบัตรประชาชน (13 หลัก)'),
+              validator: (value) {
+                if (value == null || value.isEmpty) return 'กรุณากรอกหมายเลขบัตรประชาชน';
+                if (value.length != 13) return 'กรุณากรอกหมายเลขบัตรประชาชนให้ครบ 13 หลัก';
+                if (!RegExp(r'^[0-9]{13}').hasMatch(value)) return 'หมายเลขบัตรประชาชนต้องเป็นตัวเลขเท่านั้น';
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+
+            // House ID Field
             TextFormField(
               controller: _houseIdController,
               style: GoogleFonts.kanit(color: Colors.white),
@@ -277,9 +296,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: _phoneController,
               style: GoogleFonts.kanit(color: Colors.white),
               cursorColor: const Color(0xFFC5A572),
+              keyboardType: TextInputType.phone,
+              maxLength: 10,
               decoration: _inputDecoration('เบอร์โทรศัพท์'),
-              validator: (value) =>
-                  value!.isEmpty ? 'กรุณากรอกเบอร์โทรศัพท์' : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) return 'กรุณากรอกเบอร์โทรศัพท์';
+                if (!RegExp(r'^[0-9]{10}').hasMatch(value)) return 'กรุณากรอกเบอร์โทรศัพท์เป็นตัวเลข 10 หลัก';
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 
@@ -288,9 +312,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               controller: _emailController,
               style: GoogleFonts.kanit(color: Colors.white),
               cursorColor: const Color(0xFFC5A572),
+              keyboardType: TextInputType.emailAddress,
               decoration: _inputDecoration('อีเมล'),
-              validator: (value) =>
-                  value!.isEmpty ? 'กรุณากรอกอีเมล' : null,
+              validator: (value) {
+                if (value == null || value.isEmpty) return 'กรุณากรอกอีเมล';
+                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return 'รูปแบบอีเมลไม่ถูกต้อง';
+                return null;
+              },
             ),
             const SizedBox(height: 16),
 
@@ -318,7 +346,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   return 'กรุณายืนยันรหัสผ่าน';
                 }
                 if (value != _passwordController.text) {
-                  return 'รหัสผ่านไม่ตรงกัน';
+                  return 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน';
                 }
                 return null;
               },

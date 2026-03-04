@@ -8,6 +8,7 @@ class TechnicianCard extends StatefulWidget {
   final String? imagePath;
   final Color statusColor;
   final bool isActive;
+  final bool isSelected; // SRS: Green highlight when assigned
   final int shiftOffset;
   final IconData? roleIcon;
   final String? role;
@@ -20,6 +21,7 @@ class TechnicianCard extends StatefulWidget {
     this.imagePath,
     required this.statusColor,
     this.isActive = false,
+    this.isSelected = false,
     this.shiftOffset = 0,
     this.roleIcon,
     this.role,
@@ -35,15 +37,17 @@ class _TechnicianCardState extends State<TechnicianCard> {
 
   @override
   Widget build(BuildContext context) {
-    final Color currentColor = widget.statusColor; 
-    final String currentStatus = widget.isActive ? "ACTIVE" : "INACTIVE";
+    final Color currentColor = widget.statusColor;
+    final String currentStatus = widget.isSelected ? "SELECTED" : (widget.isActive ? "ACTIVE" : "INACTIVE");
+    // SRS: Green highlight color when selected
+    final Color selectedGreen = const Color(0xFF00E676);
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       cursor: SystemMouseCursors.click,
       child: AnimatedScale(
-        scale: _isHovered ? 1.05 : (widget.isActive ? 1.0 : 0.90),
+        scale: widget.isSelected ? 1.08 : (_isHovered ? 1.05 : (widget.isActive ? 1.0 : 0.90)),
         duration: const Duration(milliseconds: 200),
         child: InkWell(
           onTap: widget.onTap,
@@ -53,21 +57,36 @@ class _TechnicianCardState extends State<TechnicianCard> {
             width: 140,
             margin: const EdgeInsets.symmetric(horizontal: 6),
             decoration: BoxDecoration(
-              color: _isHovered ? DashboardTheme.surfaceSecondary : DashboardTheme.surface,
+              color: widget.isSelected
+                  ? selectedGreen.withOpacity(0.08)
+                  : (_isHovered ? DashboardTheme.surfaceSecondary : DashboardTheme.surface),
               borderRadius: BorderRadius.circular(4),
               border: Border.all(
-                color: widget.isActive 
-                    ? currentColor.withOpacity(_isHovered ? 0.6 : 0.3) 
-                    : currentColor.withOpacity(_isHovered ? 0.3 : 0.12),
-                width: 0.8,
+                color: widget.isSelected
+                    ? selectedGreen
+                    : (widget.isActive 
+                        ? currentColor.withOpacity(_isHovered ? 0.6 : 0.3) 
+                        : currentColor.withOpacity(_isHovered ? 0.3 : 0.12)),
+                width: widget.isSelected ? 2.0 : 0.8,
               ),
-              boxShadow: (widget.isActive || _isHovered) ? [
+              boxShadow: widget.isSelected ? [
+                BoxShadow(
+                  color: selectedGreen.withOpacity(0.3),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
+                BoxShadow(
+                  color: selectedGreen.withOpacity(0.15),
+                  blurRadius: 40,
+                  spreadRadius: 4,
+                ),
+              ] : ((widget.isActive || _isHovered) ? [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
                   blurRadius: _isHovered ? 15 : 10,
                   offset: const Offset(0, 4),
                 )
-              ] : [],
+              ] : []),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -80,22 +99,33 @@ class _TechnicianCardState extends State<TechnicianCard> {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [
+                      colors: widget.isSelected ? [
+                        selectedGreen.withOpacity(0.9),
+                        selectedGreen.withOpacity(0.6),
+                      ] : [
                         widget.isActive ? currentColor.withOpacity(0.9) : currentColor.withOpacity(0.15),
                         widget.isActive ? currentColor.withOpacity(0.6) : currentColor.withOpacity(0.05),
                       ],
                     ),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(3)),
                   ),
-                  child: Text(
-                    currentStatus,
-                    style: GoogleFonts.notoSans(
-                      color: widget.isActive ? Colors.white : currentColor.withOpacity(0.6),
-                      fontSize: 8,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
-                    ),
-                    textAlign: TextAlign.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (widget.isSelected) ...[
+                        const Icon(Icons.check_circle_rounded, color: Colors.white, size: 10),
+                        const SizedBox(width: 4),
+                      ],
+                      Text(
+                        currentStatus,
+                        style: GoogleFonts.notoSans(
+                          color: widget.isSelected ? Colors.white : (widget.isActive ? Colors.white : currentColor.withOpacity(0.6)),
+                          fontSize: 8,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 // Portrait

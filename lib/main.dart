@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/auth/presentation/screens/register_screen.dart';
-import 'features/resident/presentation/screens/repair_list_screen.dart';
-import 'features/resident/presentation/screens/model_view_screen.dart';
+import 'features/resident/presentation/screens/resident_dashboard_screen.dart';
 import 'features/legal/presentation/screens/legal_dashboard_screen.dart';
+import 'features/technician/presentation/screens/technician_view_screen.dart';
 
 import 'package:fcm_app/core/data/auth_repository.dart';
 
@@ -63,8 +63,8 @@ class FcmApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/legal': (context) => const LegalDashboardScreen(),
-        '/repair_list': (context) => const RepairListScreen(),
-        '/3d_model': (context) => const ModelViewScreen(),
+        '/technician': (context) => const TechnicianViewScreen(),
+        '/3d_model': (context) => const ResidentDashboardScreen(),
       },
     );
   }

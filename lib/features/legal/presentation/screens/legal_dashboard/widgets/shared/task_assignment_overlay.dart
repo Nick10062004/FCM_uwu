@@ -6,6 +6,7 @@ import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widg
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_theme.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/data/dashboard_data.dart';
 import 'package:fcm_app/features/legal/presentation/screens/legal_dashboard/widgets/shared/dashboard_painters.dart';
+import 'package:fcm_app/core/data/repair_repository.dart';
 
 class TaskAssignmentOverlay extends StatefulWidget {
   final Map<String, dynamic> task;
@@ -390,7 +391,21 @@ class _TaskAssignmentOverlayState extends State<TaskAssignmentOverlay> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        terminalText("DEPLOYED_PERSONNEL", fontSize: 10, color: DashboardTheme.textPale, letterSpacing: 1),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            terminalText("DEPLOYED_PERSONNEL", fontSize: 10, color: DashboardTheme.textPale, letterSpacing: 1),
+                                            if (widget.draftStaffNames.isNotEmpty)
+                                              IconButton(
+                                                onPressed: () => _showSaveTeamDialog(context),
+                                                icon: const Icon(Icons.save_as_rounded, size: 18),
+                                                color: const Color(0xFF00E676),
+                                                tooltip: "บันทึกเป็น Preset",
+                                                padding: EdgeInsets.zero,
+                                                constraints: const BoxConstraints(),
+                                              ),
+                                          ],
+                                        ),
                                         const SizedBox(height: 24),
                                         Wrap(
                                           spacing: 12, runSpacing: 12,
@@ -415,7 +430,92 @@ class _TaskAssignmentOverlayState extends State<TaskAssignmentOverlay> {
                                         if (selectedTechs.isEmpty)
                                           Text("AWAITING_ASSIGNMENT...", style: GoogleFonts.shareTechMono(color: DashboardTheme.textPale, fontSize: 14)),
                                         
-                                        const SizedBox(height: 60),
+                                        // ── TEAM PRESET folder icon ──
+                                        ValueListenableBuilder<List<TeamPreset>>(
+                                          valueListenable: RepairRepository.instance.teamPresetsNotifier,
+                                          builder: (context, presets, _) {
+                                            if (presets.isEmpty) return const SizedBox(height: 40);
+                                            return Padding(
+                                              padding: const EdgeInsets.only(top: 20),
+                                              child: Row(
+                                                children: [
+                                                  PopupMenuButton<TeamPreset>(
+                                                    tooltip: "เลือกทีม Preset",
+                                                    color: DashboardTheme.surface,
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                    offset: const Offset(0, 44),
+                                                    onSelected: (preset) {
+                                                      setState(() {
+                                                        final allSelected = preset.memberNames.every((n) => widget.draftStaffNames.contains(n));
+                                                        if (allSelected) {
+                                                          widget.draftStaffNames.removeWhere((n) => preset.memberNames.contains(n));
+                                                        } else {
+                                                          for (final name in preset.memberNames) {
+                                                            if (!widget.draftStaffNames.contains(name)) widget.draftStaffNames.add(name);
+                                                          }
+                                                        }
+                                                      });
+                                                    },
+                                                    itemBuilder: (context) => presets.map((preset) {
+                                                      final allSelected = preset.memberNames.every((n) => widget.draftStaffNames.contains(n));
+                                                      return PopupMenuItem<TeamPreset>(
+                                                        value: preset,
+                                                        child: Container(
+                                                          constraints: const BoxConstraints(minWidth: 220),
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [
+                                                              Row(
+                                                                children: [
+                                                                  Icon(preset.icon, color: allSelected ? const Color(0xFF00E676) : DashboardTheme.primary, size: 18),
+                                                                  const SizedBox(width: 10),
+                                                                  Text(preset.name, style: GoogleFonts.notoSans(color: allSelected ? const Color(0xFF00E676) : DashboardTheme.textMain, fontSize: 14, fontWeight: FontWeight.w700)),
+                                                                  const Spacer(),
+                                                                  if (allSelected) const Icon(Icons.check_circle_rounded, color: Color(0xFF00E676), size: 18),
+                                                                ],
+                                                              ),
+                                                              const SizedBox(height: 4),
+                                                              Padding(
+                                                                padding: const EdgeInsets.only(left: 28),
+                                                                child: Text(
+                                                                  preset.memberNames.join(', '),
+                                                                  style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontSize: 11),
+                                                                  maxLines: 2, overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }).toList(),
+                                                    child: Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                                      decoration: BoxDecoration(
+                                                        color: DashboardTheme.surfaceSecondary,
+                                                        borderRadius: BorderRadius.circular(12),
+                                                        border: Border.all(color: DashboardTheme.primary.withOpacity(0.3)),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          Icon(Icons.folder_rounded, color: DashboardTheme.primary, size: 18),
+                                                          const SizedBox(width: 8),
+                                                          Text("เลือกทีม", style: GoogleFonts.notoSans(color: DashboardTheme.textMain, fontSize: 12, fontWeight: FontWeight.w700)),
+                                                          const SizedBox(width: 4),
+                                                          Text("(${presets.length})", style: GoogleFonts.shareTechMono(color: DashboardTheme.textPale, fontSize: 10)),
+                                                          const SizedBox(width: 6),
+                                                          Icon(Icons.expand_more_rounded, color: DashboardTheme.textPale, size: 16),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+
+                                        const SizedBox(height: 30),
                                         terminalText("OPERATIONAL_CAPABILITY // RADAR", fontSize: 10, color: DashboardTheme.textPale, letterSpacing: 1),
                                         const SizedBox(height: 24),
                                         Container(
@@ -516,6 +616,73 @@ class _TaskAssignmentOverlayState extends State<TaskAssignmentOverlay> {
                 ),
               ),
             ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSaveTeamDialog(BuildContext context) {
+    final controller = TextEditingController();
+    final memberCount = widget.draftStaffNames.length;
+    
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: DashboardTheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text("สร้างทีมใหม่จากที่เลือก", style: GoogleFonts.notoSans(color: DashboardTheme.textMain, fontSize: 18, fontWeight: FontWeight.w900)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("สมาชิกที่เลือกไว้ $memberCount คน:", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontSize: 12)),
+            const SizedBox(height: 8),
+            Text(widget.draftStaffNames.join(', '), style: GoogleFonts.notoSans(color: DashboardTheme.textSecondary, fontSize: 11), maxLines: 2),
+            const SizedBox(height: 20),
+            TextField(
+              controller: controller,
+              style: GoogleFonts.notoSans(color: DashboardTheme.textMain),
+              decoration: InputDecoration(
+                hintText: "ตั้งชื่อทีม (เช่น ทีมไฟฟ้า, กะเช้า)",
+                hintStyle: GoogleFonts.notoSans(color: DashboardTheme.textPale),
+                filled: true,
+                fillColor: DashboardTheme.background,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text("ยกเลิก", style: GoogleFonts.notoSans(color: DashboardTheme.textPale, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              final name = controller.text.trim();
+              if (name.isNotEmpty) {
+                RepairRepository.instance.addTeamPreset(
+                  name: name,
+                  memberNames: List<String>.from(widget.draftStaffNames),
+                  icon: Icons.folder_rounded,
+                );
+                Navigator.pop(ctx);
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('บันทึกทีม "$name" ($memberCount คน) เรียบร้อยแล้ว', style: GoogleFonts.notoSans(fontWeight: FontWeight.w600)),
+                  backgroundColor: const Color(0xFF00E676),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ));
+              }
+            },
+            icon: const Icon(Icons.save_rounded, size: 16),
+            label: Text("บันทึก", style: GoogleFonts.notoSans(fontWeight: FontWeight.w900, fontSize: 13)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00E676),
+              foregroundColor: Colors.black,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ],

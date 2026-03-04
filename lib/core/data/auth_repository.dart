@@ -17,11 +17,18 @@ class AuthRepository {
     // Simulate a short delay for realism
     await Future.delayed(const Duration(milliseconds: 500));
     
+    String role = 'resident';
+    if (email == 'admin@gmail.com' || email == 'admin@fcm.com' || email == 'legal@gmail.com') {
+      role = 'legal';
+    } else if (email == 'technician@gmail.com') {
+      role = 'technician';
+    }
+
     final mockData = {
       'token': 'mock_token_123',
       'userId': 'mock_user_id_456',
-      'name': 'FCM ADMIN',
-      'role': 'legal', // Force legal role for dashboard
+      'name': role == 'legal' ? 'FCM ADMIN' : (role == 'technician' ? 'TECH WICHAI' : 'RESIDENT USER'),
+      'role': role,
     };
 
     final prefs = await SharedPreferences.getInstance();

@@ -107,11 +107,14 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
                   left: constraints.maxWidth * pos.dx,
                   child: _buildMarkerWidget(
                     icon: (task['icon'] is IconData) ? task['icon'] as IconData : Icons.warning_rounded,
-                    color: task['status'] == 'URGENT' ? DashboardTheme.error : DashboardTheme.primary,
+                    color: task['status'] == 'URGENT' ? DashboardTheme.error : (task['status'] == 'WORKING' ? DashboardTheme.success : DashboardTheme.primary),
                     house: (task['house'] as String).replaceFirst('UNIT-', ''),
-                    issue: (task['title'] as String).length > 15 
-                      ? (task['title'] as String).substring(0, 15) + "..."
+                    issue: (task['title'] as String).length > 30 
+                      ? (task['title'] as String).substring(0, 30) + "..."
                       : task['title'] as String,
+                    requester: task['requester'] ?? "Admin",
+                    category: task['category'] ?? "Maintenance",
+                    status: task['status'] ?? "PENDING",
                   ),
                 );
               }),
@@ -231,6 +234,9 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
     required Color color,
     required String house,
     required String issue,
+    required String requester,
+    required String category,
+    required String status,
   }) {
     return GestureDetector(
       onTap: () => widget.onMarkerTap?.call(house, issue),
@@ -240,6 +246,9 @@ class _VillageMapWidgetState extends State<VillageMapWidget>
           color: color,
           house: house,
           issue: issue,
+          requester: requester,
+          category: category,
+          status: status,
         ),
       ),
     );
@@ -252,12 +261,18 @@ class _PulsingMarker extends StatefulWidget {
   final Color color;
   final String house;
   final String issue;
+  final String requester;
+  final String category;
+  final String status;
 
   const _PulsingMarker({
     required this.icon,
     required this.color,
     required this.house,
     required this.issue,
+    required this.requester,
+    required this.category,
+    required this.status,
   });
 
   @override
@@ -371,7 +386,9 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    widget.color == DashboardTheme.error ? '🚨 URGENT: ${widget.house}' : 'H: ${widget.house}',
+                    widget.status == 'URGENT' 
+                      ? '🚨 URGENT: ${widget.house} | ${widget.requester.split(' ')[0]}' 
+                      : (widget.status == 'WORKING' ? '🛠️ ON-GOING: ${widget.house} | ${widget.requester.split(' ')[0]}' : 'H: ${widget.house} | ${widget.requester.split(' ')[0]}'),
                     style: GoogleFonts.shareTechMono(
                       color: widget.color,
                       fontWeight: FontWeight.w900,
@@ -381,14 +398,14 @@ class _PulsingMarkerState extends State<_PulsingMarker>
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    widget.issue.toUpperCase(),
-                    style: GoogleFonts.shareTechMono(
-                      color: DashboardTheme.textMain,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
+                  widget.issue.toUpperCase(),
+                  style: GoogleFonts.shareTechMono(
+                    color: DashboardTheme.textMain,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.5,
                   ),
+                ),
                 ],
               ),
             ),

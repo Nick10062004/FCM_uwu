@@ -141,46 +141,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          // Desktop Web is usually wide, mimic the split layout
-          if (constraints.maxWidth > 900) {
-            return Row(
-              children: [
-                Expanded(
-                  flex: 6, // More space for text
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 100.0),
-                      child: _buildTitleSection(),
+      body: Stack(
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              // Desktop Web is usually wide, mimic the split layout
+              if (constraints.maxWidth > 900) {
+                return Row(
+                  children: [
+                    Expanded(
+                      flex: 6, // More space for text
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 100.0),
+                          child: _buildTitleSection(),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 4, // Card area
+                      child: Center(
+                        child: _buildRegisterForm(),
+                      ),
+                    ),
+                  ],
+                );
+              } else {
+                // Mobile / Tablet
+                return Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildTitleSection(),
+                        const SizedBox(height: 48),
+                        _buildRegisterForm(),
+                      ],
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 4, // Card area
-                  child: Center(
-                    child: _buildRegisterForm(),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            // Mobile / Tablet
-            return Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildTitleSection(),
-                    const SizedBox(height: 48),
-                    _buildRegisterForm(),
-                  ],
-                ),
+                );
+              }
+            },
+          ),
+          // Close Button
+          Positioned(
+            top: 40,
+            right: 40,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.close_rounded, color: Colors.white30, size: 28),
+              style: IconButton.styleFrom(
+                backgroundColor: Colors.white.withOpacity(0.05),
               ),
-            );
-          }
-        },
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -41,6 +41,7 @@ dependencies:
   pointer_interceptor: ^0.10.1
   http: ^1.2.0
   shared_preferences: ^2.5.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +78,7 @@ flutter:
     - assets/grace_paint.jpg
     - assets/prism_it.jpg
     - assets/coupe_maint.jpg
+    - assets/resident_profile.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

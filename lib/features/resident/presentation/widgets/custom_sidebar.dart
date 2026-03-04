@@ -225,9 +225,9 @@ class CustomSidebar extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
               decoration: BoxDecoration(
-                color: item.status == 'เสร็จสิ้น' ? const Color(0xFF2E4D2E) :
-                       item.status == 'ดำเนินการ' ? const Color(0xFF8B7348) :
-                       item.status == 'รอ' ? const Color(0xFF4A4A4A) :
+                color: (item.status == 'เสร็จสิ้น' || item.status == 'Completed') ? const Color(0xFF2E4D2E) :
+                       (item.status == 'ดำเนินการ' || item.status == 'In Progress') ? const Color(0xFF8B7348) :
+                       (item.status == 'รอ' || item.status == 'Pending') ? const Color(0xFF4A4A4A) :
                        item.status == 'ปฏิเสธ' ? const Color(0xFF8B0000) :
                        Colors.grey.shade900,
                 borderRadius: BorderRadius.circular(20),
@@ -427,8 +427,8 @@ class CustomSidebar extends StatelessWidget {
                  leading: const Icon(Icons.delete, color: Colors.red),
                  title: Text('ยกเลิกรายการนี้', style: GoogleFonts.kanit(color: Colors.white)),
                  onTap: () {
-                    RepairRepository.instance.deleteRequest(item.id);
-                    Navigator.pop(context);
+                   Navigator.pop(context);
+                   _showSidebarCancelConfirmation(context, item);
                  },
                ),
             ],
@@ -555,10 +555,11 @@ class CustomSidebar extends StatelessWidget {
                     final updated = RepairRequest(
                         id: item.id,
                         title: _editDescController.text,
+                        description: item.description,
                         date: "${_editDate.day}/${_editDate.month}/${_editDate.year + 543}",
                         status: item.status,
                         statusColor: item.statusColor,
-                        imagePath: item.imagePath,
+                        imagePaths: item.imagePaths,
                     );
                     RepairRepository.instance.updateRequest(updated);
                     Navigator.pop(context);
@@ -574,6 +575,39 @@ class CustomSidebar extends StatelessWidget {
           }
         );
       }
+    ).then((_) => onDialogVisibilityChanged?.call(false));
+  }
+  void _showSidebarCancelConfirmation(BuildContext context, RepairRequest item) {
+    onDialogVisibilityChanged?.call(true);
+    showDialog(
+      context: context,
+      barrierColor: Colors.black87,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF151515),
+        shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+              side: const BorderSide(color: Colors.redAccent),
+        ),
+        title: Text('Confirm Cancellation?', style: GoogleFonts.kanit(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to retract this repair request?', style: GoogleFonts.kanit(color: Colors.white60)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('GO BACK', style: GoogleFonts.kanit(color: Colors.white24)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              RepairRepository.instance.deleteRequest(item.id);
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Request cancelled successfully', style: GoogleFonts.kanit()), backgroundColor: Colors.redAccent),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent.withOpacity(0.8), foregroundColor: Colors.white),
+            child: Text('CONFIRM', style: GoogleFonts.kanit(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
     ).then((_) => onDialogVisibilityChanged?.call(false));
   }
 }
