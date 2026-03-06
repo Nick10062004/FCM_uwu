@@ -1,101 +1,125 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
+import { db } from "../database";
 
 dotenv.config();
 
-/** 
- * Based on STP V1.4 - AI Features:
- * 1. Multi-language (Thai, English, Chinese)
- * 2. Date/Time extraction (prefer_date)
- * 3. Conversational follow-up if info is missing
- */
-
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+export interface DBObject {
+  id: string;
+  object_name: string;
+  category: string;
+}
+
 export interface TaskRecord {
-  object_name: string;        // e.g., "Toilet", "Air Conditioner"
-  description: string;        // AI-extracted detail (detail field in STP)
-  urgency: "normal" | "emergency"; // type field in STP
-  status: string;             // Always "Pending" initially
-  prefer_date?: string;       // Preferred date/time mentioned by resident (UT-6)
+  object_id: string | null;
+  object_type: string;
+  description: string;
+  urgency: "normal" | "emergency";
+  status: string;
+  prefer_date: string;
 }
 
 export interface RequestRecord {
-  status: string;             // Always "Created" initially
+  status: string;
   tasks: TaskRecord[];
 }
 
 export interface IntentResult {
-  request: RequestRecord;
-  confidence_score: number;
-  follow_up_message?: string; // Prompt for user if info is missing (STP IntT-1)
+  request?: RequestRecord;
+  confidence_score?: number;
+  follow_up_message?: string | null;
+  fallback_required?: boolean;
+  error_type?: string;
+  message?: string;
+  raw_prompt?: string;
   raw_response?: string;
   usage_metadata?: any;
 }
 
 export class AIService {
-  // Note: 'gemini-2.5-flash' is not a valid public model. Reverting to stable 'gemini-1.5-flash'.
   private static model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-  static async analyzeRepairIntent(description: string): Promise<IntentResult> {
+  static async analyzeRepairIntent(
+    description: string,
+    availableObjects: DBObject[]
+  ): Promise<IntentResult> {
+    const startTime = Date.now();
+    const objectsContext = availableObjects
+      .map(obj => `- ID: ${obj.id}, Name: ${obj.object_name}, Category: ${obj.category}`)
+      .join("\n");
+
     const prompt = `
-      You are a Senior AI Dispatcher for Vivorn Villa (High-end Housing Estate).
-      Your task is to parse repair requests into a structured JSON Request object.
+      You are a Senior AI Dispatcher for Vivorn Villa (High-end Estate).
+      Parse resident maintenance requests into JSON.
 
-      Support Languages: Thai, English, Chinese (Simplified/Traditional).
+      AVAILABLE HARDWARE CONTEXT:
+      ${objectsContext}
 
-      Resident Input: "${description}"
+      RESIDENT INPUT: "${description}"
 
-      Rules (Based on Software Test Plan V1.4):
-      1. Extract individual tasks: If user mentions multiple items, create multiple objects in the 'tasks' array.
-      2. Object Name: Precise name of the physical item (e.g., "Kitchen Sink", "โถชำระ").
-      3. Urgency: 'emergency' for fire, flood, total power loss, jammed doors, or blocked drains. Otherwise 'normal'.
-      4. Prefer Date: Extract any mentioned availability (e.g., "Wednesday morning", "tomorrow at 9"). Format: readable string.
-      5. follow_up_message: If the resident's input is missing details (e.g., "Fix the toilet" - missing what's wrong), 
-         provide a polite follow-up question in the same language as the input to ask for more detail. (Reference STP IntT-1).
+      RULES:
+      1. URGENCIES: Default 'normal'. 'emergency' ONLY if "Pipe burst" (ท่อแตก) or "Total blackout" (ไฟดับทั้งบ้าน).
+      2. TIME SLOTS: Normalized to 09:30:00 or 13:00:00.
+      3. prefer_date cannot be in the past. If null, ask for clarification.
+      4. LANGUAGE: follow_up_message and descriptions MUST match Input language.
+      5. Mapping: Use Context IDs. object_type from Category.
 
-      The JSON response MUST match this schema:
+      JSON:
       {
-        "request": {
-          "status": "Created",
-          "tasks": [
-            {
-              "object_name": "string",
-              "description": "string (what is wrong)",
-              "urgency": "normal" | "emergency",
-              "status": "Pending",
-              "prefer_date": "string or null"
-            }
-          ]
-        },
-        "follow_up_message": "polite question if more info is needed, otherwise null",
-        "confidence_score": number (0 to 1)
+        "request": { "status": "Created", "tasks": [...] },
+        "follow_up_message": "...",
+        "confidence_score": 0.9
       }
-
-      Return ONLY raw JSON. No conversational text or markdown.
     `;
 
     try {
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       let text = response.text();
-
+      
       if (text.includes("```json")) {
         text = text.replace(/```json|```/g, "").trim();
       }
 
       const parsed = JSON.parse(text);
-
       return {
-        request: parsed.request || { status: "Created", tasks: [] },
-        follow_up_message: parsed.follow_up_message || null,
-        confidence_score: parsed.confidence_score || 0.5,
+        ...parsed,
+        raw_prompt: prompt,
         raw_response: text,
         usage_metadata: response.usageMetadata
       };
-    } catch (error) {
-      console.error("Gemini AI Analysis Error:", error);
-      throw new Error("AI_DISPATCH_FAILED");
+    } catch (error: any) {
+      const processingTime = (Date.now() - startTime) / 1000;
+      const errorMessage = error.message || "Unknown Gemini Error";
+      
+      // SRS Reliability-1: Log failure to ai_log even on error
+      // Using explicit 0 for success_flag
+      try {
+        db.prepare(`
+          INSERT INTO ai_log (raw_prompt, raw_response, success_flag, error_message, processing_time_sec)
+          VALUES (?, ?, 0, ?, ?)
+        `).run(prompt, "N/A", errorMessage, processingTime);
+      } catch (logErr) {
+        console.error("Failed to log AI error to DB:", logErr);
+      }
+
+      // Elegant Fallback for 503/429
+      if (errorMessage.includes("503") || errorMessage.includes("429") || errorMessage.includes("overloaded")) {
+        return {
+          request: { status: "Created", tasks: [] },
+          follow_up_message: null,
+          confidence_score: 0,
+          fallback_required: true,
+          error_type: "API_OVERLOAD",
+          message: "ขออภัยค่ะตอนนี้ระบบมีการใช้งานมากเกินไป โปรดรอสักครู่แล้วลองใหม่ค่ะ",
+          raw_prompt: prompt,
+          raw_response: errorMessage
+        };
+      }
+
+      throw error;
     }
   }
 }

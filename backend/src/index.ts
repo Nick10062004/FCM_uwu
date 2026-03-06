@@ -17,6 +17,7 @@ app.use(express.json());
 
 // Routes (FCM - Facility Management System Endpoint)
 app.post("/api/repair/intent", authMiddleware, RepairController.processIntent);
+app.post("/api/repair/confirm", authMiddleware, RepairController.confirmRequest);
 
 // Simple health check
 app.get("/health", (req, res) => res.status(200).json({ status: "OK", time: new Date() }));
