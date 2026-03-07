@@ -2,8 +2,6 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import { RepairController } from "./controllers/repair.controller";
-import { authMiddleware } from "./middlewares/auth.middleware";
 
 dotenv.config();
 
@@ -15,9 +13,16 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
-// Routes (FCM - Facility Management System Endpoint)
-app.post("/api/repair/intent", authMiddleware, RepairController.processIntent);
-app.post("/api/repair/confirm", authMiddleware, RepairController.confirmRequest);
+// Routes Registration
+import authRouter from "./routes/auth.routes";
+import personnelRouter from "./routes/personnel.routes";
+import devRouter from "./routes/dev.routes";
+import repairRouter from "./routes/repair.routes";
+
+app.use("/api/auth", authRouter);
+app.use("/api/personnel", personnelRouter);
+app.use("/api/dev", devRouter);
+app.use("/api/repair", repairRouter);
 
 // Simple health check
 app.get("/health", (req, res) => res.status(200).json({ status: "OK", time: new Date() }));

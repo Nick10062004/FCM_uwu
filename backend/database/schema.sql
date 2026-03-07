@@ -1,68 +1,100 @@
--- Vivorn Villa Facility Management System (FCM)
--- SQLite Database Schema v3.3 - Senior Backend Architect
--- Support for Strict Identity Verification & Business Logic Guardrails
+-- Vivorn Villa FCM Database Schema v3.7
+-- Technician Reporting & Resident Feedback System
 
 PRAGMA foreign_keys = ON;
 
--- 1. users: Core identity management with 13-digit ID verification
+-- 0. real_estate_records: Whitelist for residents
+CREATE TABLE IF NOT EXISTS real_estate_records (
+    national_id TEXT PRIMARY KEY,
+    house_number TEXT NOT NULL,
+    full_name TEXT NOT NULL,
+    citizen_type TEXT -- Thai, Chinese, English
+);
+
+-- 1. users: Core identity
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    phone TEXT,
     password_hash TEXT NOT NULL,
-    role TEXT CHECK(role IN ('Resident', 'Admin', 'Technician')) NOT NULL,
-    id_card_number TEXT UNIQUE NOT NULL, -- Mandatory 13-digit verification (Resident/Staff)
-    employee_id TEXT UNIQUE, -- Specifically for Technicians and Juridists (Admins)
+    pin_hash TEXT,
+    is_first_login BOOLEAN DEFAULT 1,
+    role TEXT NOT NULL CHECK(role IN ('Resident', 'Technician', 'Jurisdictic')),
+    national_id TEXT UNIQUE NOT NULL,
+    employee_id TEXT UNIQUE,
+    full_name TEXT,
+    face_image_url TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. properties: The physical units/houses
+-- 2. properties: The units
 CREATE TABLE IF NOT EXISTS properties (
     id TEXT PRIMARY KEY,
     house_number TEXT UNIQUE NOT NULL,
-    zone TEXT,
+    alley TEXT,
+    status TEXT NOT NULL CHECK(status IN ('vacant', 'occupy')),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. object: Physical items within a house
+-- 3. object: Physical items
 CREATE TABLE IF NOT EXISTS object (
     id TEXT PRIMARY KEY,
     property_id TEXT NOT NULL,
     object_name TEXT NOT NULL,
     model_ref_3d TEXT NOT NULL,
-    category TEXT, -- e.g., 'Bathroom', 'Kitchen', 'Electrical'
+    category TEXT,
+    labor_fee REAL DEFAULT 0,
+    part_fee REAL DEFAULT 0,
     FOREIGN KEY (property_id) REFERENCES properties(id)
 );
 
--- 4. request: Master record (Container for tasks)
+-- 4. request: Master maintenance record
 CREATE TABLE IF NOT EXISTS request (
     id TEXT PRIMARY KEY,
     resident_id TEXT NOT NULL,
     property_id TEXT NOT NULL,
+    technician_id TEXT, -- Added: the technician assigned to the whole request
     status TEXT CHECK(status IN ('Created', 'Assigned', 'In-Progress', 'Completed', 'Reviewed', 'Cancelled')) DEFAULT 'Created',
+    repair_report TEXT, -- Added: Summary report from technician
+    after_repair_image_url TEXT, -- Added
+    completed_at DATETIME, -- Added: To enforce 7-day feedback rule
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (resident_id) REFERENCES users(id),
-    FOREIGN KEY (property_id) REFERENCES properties(id)
+    FOREIGN KEY (property_id) REFERENCES properties(id),
+    FOREIGN KEY (technician_id) REFERENCES users(id)
 );
 
--- 5. task: Individual repair items with object_type categorization
+-- 5. task: Individual repair items
 CREATE TABLE IF NOT EXISTS task (
     id TEXT PRIMARY KEY,
     request_id TEXT NOT NULL,
     object_id TEXT, 
-    object_type TEXT, -- AI-extracted from object category (e.g., Bathroom)
+    object_type TEXT,
     description TEXT,
     urgency TEXT CHECK(urgency IN ('normal', 'emergency')) DEFAULT 'normal',
-    status TEXT DEFAULT 'Pending',
-    prefer_date DATETIME, -- Normalized AI-extracted date (Time Slots enforced)
+    status TEXT DEFAULT 'Pending' CHECK(status IN ('Pending', 'InProgress', 'Completed')),
+    task_report TEXT, -- Added: Detailed report per item
+    after_repair_image_url TEXT, -- Added
+    prefer_date DATETIME,
     FOREIGN KEY (request_id) REFERENCES request(id) ON DELETE CASCADE,
     FOREIGN KEY (object_id) REFERENCES object(id)
 );
 
--- 6. ai_log: Tracking performance, privacy, and results
+-- 6. evaluation: Resident feedback (FE-03)
+CREATE TABLE IF NOT EXISTS evaluation (
+    id TEXT PRIMARY KEY,
+    request_id TEXT UNIQUE NOT NULL,
+    rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+    comment TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (request_id) REFERENCES request(id)
+);
+
+-- 7. ai_log: System performance
 CREATE TABLE IF NOT EXISTS ai_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     request_id TEXT,
@@ -76,7 +108,7 @@ CREATE TABLE IF NOT EXISTS ai_log (
     FOREIGN KEY (request_id) REFERENCES request(id)
 );
 
--- Indices for Privacy & Security Audit
-CREATE INDEX IF NOT EXISTS idx_users_id_card ON users(id_card_number);
+CREATE INDEX IF NOT EXISTS idx_users_national_id ON users(national_id);
 CREATE INDEX IF NOT EXISTS idx_task_request ON task(request_id);
 CREATE INDEX IF NOT EXISTS idx_object_property ON object(property_id);
+CREATE INDEX IF NOT EXISTS idx_evaluation_request ON evaluation(request_id);

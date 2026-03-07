@@ -2,7 +2,7 @@ import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
 
-const dbPath = path.join(process.cwd(), "database/fcm.db");
+const dbPath = path.join(process.cwd(), "database/vivorn_villa.db");
 const schemaPath = path.join(process.cwd(), "database/schema.sql");
 
 // Ensure directory exists
