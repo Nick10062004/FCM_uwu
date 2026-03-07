@@ -33,44 +33,60 @@ export class AuthController {
    * Result Codes: REGISTRATION_SUCCESS, ID_NOT_FOUND, ALREADY_REGISTERED
    */
   static async register(req: Request, res: Response) {
+    console.log("-----------------------------------------");
+    console.log("[FCM Backend] Registration Attempt");
+    console.log("[FCM Backend] Incoming Body:", req.body);
+
     try {
       const { national_id, email, phone, password } = RegisterSchema.parse(req.body);
+      console.log(`[FCM Backend] Zod Validation Passed for: ${national_id}`);
 
       const estateRecord = db.prepare("SELECT * FROM real_estate_records WHERE national_id = ?").get(national_id) as any;
       if (!estateRecord) {
+        console.warn(`[FCM Backend] Registration Failed: ID_NOT_FOUND (${national_id})`);
         return res.status(403).json({
           success: false,
           status_code: "ID_NOT_FOUND"
         });
       }
 
+      console.log(`[FCM Backend] Real Estate Record Found: ${estateRecord.full_name}`);
+
       const existingUser = db.prepare("SELECT id FROM users WHERE national_id = ? OR email = ?").get(national_id, email);
       if (existingUser) {
+        console.warn(`[FCM Backend] Registration Failed: ALREADY_REGISTERED (${national_id} or ${email})`);
         return res.status(409).json({
           success: false,
           status_code: "ALREADY_REGISTERED"
         });
       }
 
-      const username = `${estateRecord.first_name}_${estateRecord.last_name}_${national_id.slice(-4)}`.toLowerCase();
+      const username = `${estateRecord.full_name.replace(/\s+/g, '_')}_${national_id.slice(-4)}`.toLowerCase();
       const password_hash = await bcrypt.hash(password, 10);
       const userId = uuidv4();
 
       db.prepare(`
-        INSERT INTO users (id, username, email, phone, password_hash, role, national_id, is_first_login)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-      `).run(userId, username, email, phone, password_hash, 'Resident', national_id);
+        INSERT INTO users (id, username, email, phone, password_hash, role, national_id, is_first_login, full_name)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)
+      `).run(userId, username, email, phone, password_hash, 'Resident', national_id, estateRecord.full_name);
+
+      console.log(`[FCM Backend] Registration SUCCESS! User ID: ${userId}`);
 
       return res.status(201).json({
         success: true,
-        status_code: "REGISTRATION_SUCCESS"
+        status_code: "REGISTRATION_SUCCESS",
+        userId: userId
       });
 
     } catch (error: any) {
       if (error instanceof z.ZodError) {
+        console.error("[FCM Backend] Registration Failed: VALIDATION_ERROR");
+        console.error(JSON.stringify(error.issues, null, 2));
         return res.status(400).json({ success: false, status_code: "VALIDATION_ERROR", errors: error.issues });
       }
-      return res.status(500).json({ success: false, status_code: "SERVER_ERROR" });
+
+      console.error("[FCM Backend] Registration Failed: SERVER_ERROR", error);
+      return res.status(500).json({ success: false, status_code: "SERVER_ERROR", message: error.message });
     }
   }
 
@@ -132,6 +148,35 @@ export class AuthController {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ success: false, status_code: "VALIDATION_ERROR", errors: error.issues });
       }
+      return res.status(500).json({ success: false, status_code: "SERVER_ERROR" });
+    }
+  }
+
+  /**
+   * GET /api/auth/profile
+   * Returns current user info based on JWT
+   */
+  static async getProfile(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.id;
+
+      // Get basic user info
+      const user = db.prepare(`
+        SELECT u.id, u.username, u.email, u.phone, u.role, u.full_name as name, u.is_first_login, r.house_number as houseId
+        FROM users u
+        LEFT JOIN real_estate_records r ON u.national_id = r.national_id
+        WHERE u.id = ?
+      `).get(userId) as any;
+
+      if (!user) {
+        return res.status(404).json({ success: false, status_code: "USER_NOT_FOUND" });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: user
+      });
+    } catch (error) {
       return res.status(500).json({ success: false, status_code: "SERVER_ERROR" });
     }
   }
