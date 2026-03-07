@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users (
     pin_hash TEXT,
     is_first_login BOOLEAN DEFAULT 1,
     role TEXT NOT NULL CHECK(role IN ('Resident', 'Technician', 'Jurisdictic')),
-    national_id TEXT UNIQUE NOT NULL,
+    national_id TEXT NOT NULL,
     employee_id TEXT UNIQUE,
     full_name TEXT,
     face_image_url TEXT,

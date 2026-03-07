@@ -52,16 +52,18 @@ export class AuthController {
 
       console.log(`[FCM Backend] Real Estate Record Found: ${estateRecord.full_name}`);
 
-      const existingUser = db.prepare("SELECT id FROM users WHERE national_id = ? OR email = ?").get(national_id, email);
+      // Only email must be unique — same person can have multiple accounts for different houses
+      const existingUser = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
       if (existingUser) {
-        console.warn(`[FCM Backend] Registration Failed: ALREADY_REGISTERED (${national_id} or ${email})`);
+        console.warn(`[FCM Backend] Registration Failed: ALREADY_REGISTERED (${email})`);
         return res.status(409).json({
           success: false,
           status_code: "ALREADY_REGISTERED"
         });
       }
 
-      const username = `${estateRecord.full_name.replace(/\s+/g, '_')}_${national_id.slice(-4)}`.toLowerCase();
+      // Append timestamp to ensure username stays unique for multiple registrations
+      const username = `${estateRecord.full_name.replace(/\s+/g, '_')}_${Date.now()}`.toLowerCase();
       const password_hash = await bcrypt.hash(password, 10);
       const userId = uuidv4();
 
