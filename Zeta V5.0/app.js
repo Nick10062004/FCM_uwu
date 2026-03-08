@@ -116,7 +116,7 @@ function renderRequests(filter = 'all') {
                 tr.innerHTML = `
                     <td>
                         <div style="font-weight: 600;" data-i18n="req_title_${req.id}">${req.title}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);"><span data-i18n="reported_on">แจ้งเมื่อ</span> ${req.date}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);"><span data-i18n="reported_on">แจ้งเมื่อ</span> <span data-i18n="req_date_${req.id}">${req.date}</span></div>
                     </td>
                     <td>${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openReviewModal(${req.id})" data-i18n="btn_evaluate_short">ประเมินผล</button>`) : `<span class="status-badge status-${req.status}" data-i18n="status_${req.status}">${req.statusText}</span>`}</td>
                 `;
@@ -135,7 +135,7 @@ function renderRequests(filter = 'all') {
                 const tr = document.createElement('tr');
                 tr.className = 'animate-fade-in';
                 tr.innerHTML = `
-                    <td>${req.date}</td>
+                    <td><span data-i18n="req_date_${req.id}">${req.date}</span></td>
                     <td data-i18n="req_cat_${req.category === 'ระบบประปา' ? 'plumbing' : (req.category === 'ระบบไฟฟ้า' ? 'electric' : 'other')}">${req.category || 'ทั่วไป'}</td>
                     <td data-i18n="req_title_${req.id}">${req.title}</td>
                     <td><span class="status-badge status-${req.status}" data-i18n="status_${req.status}">${req.statusText}</span></td>
