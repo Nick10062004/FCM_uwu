@@ -115,7 +115,7 @@ function renderRequests(filter = 'all') {
                 tr.className = 'animate-fade-in';
                 tr.innerHTML = `
                     <td>
-                        <div style="font-weight: 600;">${req.title}</div>
+                        <div style="font-weight: 600;" data-i18n="req_title_${req.id}">${req.title}</div>
                         <div style="font-size: 0.8rem; color: var(--text-muted);"><span data-i18n="reported_on">แจ้งเมื่อ</span> ${req.date}</div>
                     </td>
                     <td>${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openReviewModal(${req.id})" data-i18n="btn_evaluate_short">ประเมินผล</button>`) : `<span class="status-badge status-${req.status}" data-i18n="status_${req.status}">${req.statusText}</span>`}</td>
@@ -136,8 +136,8 @@ function renderRequests(filter = 'all') {
                 tr.className = 'animate-fade-in';
                 tr.innerHTML = `
                     <td>${req.date}</td>
-                    <td>${req.category || 'ทั่วไป'}</td>
-                    <td>${req.title}</td>
+                    <td data-i18n="req_cat_${req.category === 'ระบบประปา' ? 'plumbing' : (req.category === 'ระบบไฟฟ้า' ? 'electric' : 'other')}">${req.category || 'ทั่วไป'}</td>
+                    <td data-i18n="req_title_${req.id}">${req.title}</td>
                     <td><span class="status-badge status-${req.status}" data-i18n="status_${req.status}">${req.statusText}</span></td>
                     <td style="color: #fbbf24;">${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="openReviewModal(${req.id})" data-i18n="btn_evaluate">ประเมิน</button>`) : '-'}</td>
                 `;
@@ -686,11 +686,11 @@ function renderFurniture(category = 'all') {
     filtered.forEach(item => {
         const remaining = calculateRemainingDays(item.end);
         let badgeClass = 'badge-ok';
-        let statusText = `เหลืออีก ${remaining} วัน`;
+        let statusText = `<span data-i18n="days_left">เหลืออีก</span> <span class="days-count">${remaining}</span> <span data-i18n="days">วัน</span>`;
 
         if (remaining <= 0) {
             badgeClass = 'badge-expired';
-            statusText = 'หมดประกัน';
+            statusText = '<span data-i18n="expired">หมดประกัน</span>';
         } else if (remaining < 30) {
             badgeClass = 'badge-warning';
         }
@@ -698,16 +698,20 @@ function renderFurniture(category = 'all') {
         const card = document.createElement('div');
         card.className = 'furniture-card animate-fade-in';
         card.innerHTML = `
-            <div style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;">${item.name}</div>
+            <div style="font-weight: 700; color: var(--text-main); font-size: 1.1rem;" data-i18n="furn_${item.id}">${item.name}</div>
             <span class="remaining-badge ${badgeClass}">${statusText}</span>
             <div class="warranty-info">
-                <div><ion-icon name="calendar-outline" style="vertical-align: middle;"></ion-icon> เริ่ม: ${new Date(item.start).toLocaleDateString('th-TH')}</div>
-                <div><ion-icon name="shield-checkmark-outline" style="vertical-align: middle;"></ion-icon> สิ้นสุด: ${new Date(item.end).toLocaleDateString('th-TH')}</div>
+                <div><ion-icon name="calendar-outline" style="vertical-align: middle;"></ion-icon> <span data-i18n="wty_start">เริ่ม:</span> ${new Date(item.start).toLocaleDateString('th-TH')}</div>
+                <div><ion-icon name="shield-checkmark-outline" style="vertical-align: middle;"></ion-icon> <span data-i18n="wty_end">สิ้นสุด:</span> ${new Date(item.end).toLocaleDateString('th-TH')}</div>
             </div>
-            <button class="btn" style="padding: 0.5rem; font-size: 0.8rem; border: 1px solid var(--border); background: var(--bg-card);" onclick="alert('แจ้งซ่อม ${item.name}...')">แจ้งซ่อมรายการนี้</button>
+            <button class="btn" style="padding: 0.5rem; font-size: 0.8rem; border: 1px solid var(--border); background: var(--bg-card);" onclick="alert('แจ้งซ่อม ${item.name}...')"><span data-i18n="btn_repair_this">แจ้งซ่อมรายการนี้</span></button>
         `;
         grid.appendChild(card);
     });
+    
+    if (typeof changeLanguage === 'function') {
+        setTimeout(() => changeLanguage(localStorage.getItem('zeta_lang') || 'th'), 0);
+    }
 }
 
 // Tab interaction
@@ -1158,8 +1162,8 @@ function createRequestCard(req, isInternal = false) {
                 <ion-icon name="${req.icon || 'alert-circle-outline'}"></ion-icon>
             </div>
             <div>
-                <h3 style="font-size: 1rem; margin-bottom: 0.2rem;">${req.title}</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted);">${locationLabel} | แจ้งโดย ${req.requester || 'ลูกบ้าน'} | ${req.date}</p>
+                <h3 style="font-size: 1rem; margin-bottom: 0.2rem;" data-i18n="req_title_${req.id}">${req.title}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">${locationLabel} | <span data-i18n="reported_by">แจ้งโดย</span> ${req.requester || 'ลูกบ้าน'} | <span data-i18n="req_date_${req.id}">${req.date}</span></p>
             </div>
         </div>
         ${actionsUI}
