@@ -39,11 +39,13 @@ export interface IntentResult {
 }
 
 export class AIService {
-  private static model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  private static model = genAI.getGenerativeModel({ model: "gemini-3.1-flash-lite-preview" });
 
   static async analyzeRepairIntent(
     description: string,
-    availableObjects: DBObject[]
+    availableObjects: DBObject[],
+    residentInfo?: { name: string; house_number: string },
+    chatHistory?: string
   ): Promise<IntentResult> {
     const startTime = Date.now();
     const objectsContext = availableObjects
@@ -51,13 +53,20 @@ export class AIService {
       .join("\n");
 
     const prompt = `
-      You are a Senior AI Dispatcher for Vivorn Villa (High-end Estate).
-      Parse resident maintenance requests into JSON.
+      You are a Senior AI Assistant for Vivorn Villa (High-end Estate).
+      Your job is to talk politely with the resident, answer questions based on context, and parse maintenance requests into JSON.
 
-      AVAILABLE HARDWARE CONTEXT:
+      RESIDENT CONTEXT:
+      Name: ${residentInfo?.name || "Unknown"}
+      House Number: ${residentInfo?.house_number || "Unknown"}
+
+      AVAILABLE HARDWARE IN RESIDENCE:
       ${objectsContext}
 
-      RESIDENT INPUT: "${description}"
+      PREVIOUS CHAT HISTORY:
+      ${chatHistory || "No previous history."}
+
+      CURRENT RESIDENT INPUT: "${description}"
 
       RULES:
       1. URGENCIES: Default 'normal'. 'emergency' ONLY if "Pipe burst" (ท่อแตก) or "Total blackout" (ไฟดับทั้งบ้าน).
@@ -65,6 +74,7 @@ export class AIService {
       3. prefer_date cannot be in the past. If null, ask for clarification.
       4. LANGUAGE: follow_up_message and descriptions MUST match Input language.
       5. Mapping: Use Context IDs. object_type from Category.
+      6. CLARIFICATION: If the user mentions a problem but the description is vague (e.g., 'broken', 'not working', 'ชำรุด'), you MUST ask for specific details about the issue before finalizing the JSON request. Do NOT return the "tasks" array if you do not have a clear description of the damage.
 
       JSON:
       {
@@ -74,18 +84,53 @@ export class AIService {
       }
     `;
 
+    console.log("-----------------------------------------");
+    console.log("[AIService] GENERATED PROMPT:");
+    console.log(prompt);
+    console.log("-----------------------------------------");
+
     try {
       const result = await this.model.generateContent(prompt);
       const response = await result.response;
       let text = response.text();
-      
+
+      // Strip markdown code fences if present
       if (text.includes("```json")) {
         text = text.replace(/```json|```/g, "").trim();
       }
 
-      const parsed = JSON.parse(text);
+      // Extract JSON block from response — Gemini often wraps it in prose text
+      // We look for the first '{' to last '}' to isolate the JSON
+      const jsonStart = text.indexOf("{");
+      const jsonEnd = text.lastIndexOf("}");
+
+      if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+        const jsonStr = text.substring(jsonStart, jsonEnd + 1);
+        try {
+          const parsed = JSON.parse(jsonStr);
+          // If there's prose text before the JSON, it may be a fallback message
+          // Prefer the follow_up_message from JSON, but log any prefix text
+          const prefixText = text.substring(0, jsonStart).trim();
+          if (prefixText) {
+            console.log("[AIService] Prose prefix before JSON (ignored):", prefixText);
+          }
+          return {
+            ...parsed,
+            raw_prompt: prompt,
+            raw_response: text,
+            usage_metadata: response.usageMetadata
+          };
+        } catch {
+          // JSON extraction failed even though we found braces — fall through to conversational
+          console.log("[AIService] JSON extraction failed, treating as conversational.");
+        }
+      }
+
+      // Gemini gave a purely conversational reply with no JSON
+      console.log("[AIService] Conversational reply (no JSON).");
       return {
-        ...parsed,
+        follow_up_message: text,
+        confidence_score: 1.0,
         raw_prompt: prompt,
         raw_response: text,
         usage_metadata: response.usageMetadata
@@ -93,7 +138,7 @@ export class AIService {
     } catch (error: any) {
       const processingTime = (Date.now() - startTime) / 1000;
       const errorMessage = error.message || "Unknown Gemini Error";
-      
+
       // SRS Reliability-1: Log failure to ai_log even on error
       // Using explicit 0 for success_flag
       try {
