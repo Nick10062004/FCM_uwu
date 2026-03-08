@@ -20,8 +20,8 @@
 <body class="auth-page">
     <div class="card animate-fade-in" style="width: 400px; padding: 3rem; text-align: center;">
         <div class="auth-header">
-            <h1 style="font-size: 1.8rem;">ยืนยันความปลอดภัย</h1>
-            <p style="color: var(--text-muted);">กรุณากรอกรหัส PIN 6 หลักเพื่อเข้าใช้งาน</p>
+            <h1 style="font-size: 1.8rem;" data-i18n="pin_verify_header">ยืนยันความปลอดภัย</h1>
+            <p style="color: var(--text-muted);" data-i18n="pin_verify_desc">กรุณากรอกรหัส PIN 6 หลักเพื่อเข้าใช้งาน</p>
         </div>
 
         <div class="pin-display" id="pinDisplay">
@@ -51,16 +51,17 @@
         </div>
 
         <button id="btn-verify-pin" class="btn btn-primary"
-            style="width: 100%; padding: 1rem; margin-top: 2rem; font-size: 1rem;" disabled onclick="verifyPin()">
+            style="width: 100%; padding: 1rem; margin-top: 2rem; font-size: 1rem;" disabled onclick="verifyPin()" data-i18n="btn_verify_pin">
             ยืนยันรหัส PIN
         </button>
 
         <div style="margin-top: 1.5rem;">
             <a href="login.html" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;"
-                onclick="localStorage.removeItem('zeta_logged_in')">ลืมรหัส PIN? เข้าสู่ระบบใหม่</a>
+                onclick="localStorage.removeItem('zeta_logged_in')" data-i18n="forgot_pin">ลืมรหัส PIN? เข้าสู่ระบบใหม่</a>
         </div>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

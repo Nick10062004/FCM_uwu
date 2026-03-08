@@ -31,23 +31,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="stats-chart-outline"></ion-icon>
-                            <span>แดชบอร์ด</span>
+                            <span data-i18n="jur_nav_dashboard">แดชบอร์ด</span>
                         </a></li>
                     <li><a href="requests.html" class="nav-item">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>จัดการงานซ่อม</span>
+                            <span data-i18n="jur_nav_requests">จัดการงานซ่อม</span>
                         </a></li>
                     <li><a href="technicians.html" class="nav-item">
                             <ion-icon name="people-outline"></ion-icon>
-                            <span>รายชื่อช่าง</span>
+                            <span data-i18n="jur_nav_techs">รายชื่อช่าง</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="jur_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item active">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="jur_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -55,45 +55,52 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout_jur">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>ตั้งค่าระบบ</h1>
-                <p class="header-meta">ปรับแต่งการทำงานของส่วนจัดการนิติบุคคล</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="jur_set_title">ตั้งค่าระบบ</h1>
+                    <p class="header-meta" data-i18n="jur_set_meta">ปรับแต่งการทำงานของส่วนจัดการนิติบุคคล</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div style="max-width: 800px; margin: 0 auto;">
                 <section class="card settings-section animate-fade-in">
-                    <h3>ธีมหลังบ้าน</h3>
+                    <h3 data-i18n="theme_backend">ธีมหลังบ้าน</h3>
                     <div class="theme-selector">
                         <div class="theme-option" data-theme="light" onclick="setTheme('light', true)">
                             <div class="theme-preview" style="background: #f8fafc; border: 1px solid #e2e8f0;"></div>
-                            <span>สว่าง</span>
+                            <span data-i18n="theme_light">สว่าง</span>
                         </div>
                         <div class="theme-option" data-theme="dark" onclick="setTheme('dark', true)">
                             <div class="theme-preview" style="background: #0f172a; border: 1px solid #334155;"></div>
-                            <span>มืด</span>
+                            <span data-i18n="theme_dark">มืด</span>
                         </div>
                     </div>
                 </section>
 
                 <section class="card settings-section animate-fade-in" style="animation-delay: 0.1s;">
-                    <h3>การจัดการความรักษาความปลอดภัย</h3>
+                    <h3 data-i18n="security_management">การจัดการความรักษาความปลอดภัย</h3>
                     <div class="settings-group">
                         <div class="setting-row">
-                            <span>บังคับตั้ง PIN สำหรับสมาชิกลงทะเบียนใหม่</span>
+                            <span data-i18n="force_pin">บังคับตั้ง PIN สำหรับสมาชิกลงทะเบียนใหม่</span>
                             <label class="switch">
                                 <input type="checkbox" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
                         <div class="setting-row">
-                            <span>แจ้งเตือนเมื่องานค้างเกิน 24 ชม.</span>
+                            <span data-i18n="notify_24h">แจ้งเตือนเมื่องานค้างเกิน 24 ชม.</span>
                             <label class="switch">
                                 <input type="checkbox" checked>
                                 <span class="slider"></span>
@@ -103,12 +110,13 @@
                 </section>
 
                 <div class="settings-actions">
-                    <button class="btn btn-primary" onclick="alert('บันทึกสำเร็จ')">บันทึกข้อมูล</button>
+                    <button class="btn btn-primary" onclick="alert(document.querySelector('.lang-btn.active')?.dataset.lang === 'en' ? 'Settings Saved' : document.querySelector('.lang-btn.active')?.dataset.lang === 'zh' ? '保存成功' : 'บันทึกสำเร็จ')"><span data-i18n="btn_save_settings">บันทึกข้อมูล</span></button>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

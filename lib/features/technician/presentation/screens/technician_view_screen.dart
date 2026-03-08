@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/data/auth_repository.dart';
 
 class TechnicianViewScreen extends StatefulWidget {
   const TechnicianViewScreen({super.key});
@@ -144,8 +145,10 @@ class _TechnicianViewScreenState extends State<TechnicianViewScreen> {
           Padding(
             padding: const EdgeInsets.all(24),
             child: OutlinedButton.icon(
-              onPressed: () =>
-                  Navigator.pushReplacementNamed(context, '/login'),
+              onPressed: () async {
+                await AuthRepository.instance.logout();
+                if (mounted) Navigator.pushReplacementNamed(context, '/login');
+              },
               icon: const Icon(Icons.logout_rounded, size: 18),
               label: Text("ออกจากระบบ", style: GoogleFonts.kanit()),
               style: OutlinedButton.styleFrom(

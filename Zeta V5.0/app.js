@@ -108,7 +108,7 @@ function renderRequests(filter = 'all') {
     if (list) {
         list.innerHTML = '';
         if (filtered.length === 0) {
-            list.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 2rem; color: var(--text-muted);">ไม่พบรายการ</td></tr>';
+            list.innerHTML = '<tr><td colspan="2" style="text-align:center; padding: 2rem; color: var(--text-muted);" data-i18n="empty_requests">ไม่พบรายการ</td></tr>';
         } else {
             filtered.forEach(req => {
                 const tr = document.createElement('tr');
@@ -116,9 +116,9 @@ function renderRequests(filter = 'all') {
                 tr.innerHTML = `
                     <td>
                         <div style="font-weight: 600;">${req.title}</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">แจ้งเมื่อ ${req.date}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);"><span data-i18n="reported_on">แจ้งเมื่อ</span> ${req.date}</div>
                     </td>
-                    <td>${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openReviewModal(${req.id})">ประเมินผล</button>`) : `<span class="status-badge status-${req.status}">${req.statusText}</span>`}</td>
+                    <td>${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.3rem 0.6rem; font-size: 0.8rem;" onclick="openReviewModal(${req.id})" data-i18n="btn_evaluate_short">ประเมินผล</button>`) : `<span class="status-badge status-${req.status}" data-i18n="status_${req.status}">${req.statusText}</span>`}</td>
                 `;
                 list.appendChild(tr);
             });
@@ -129,7 +129,7 @@ function renderRequests(filter = 'all') {
     if (historyList) {
         historyList.innerHTML = '';
         if (filtered.length === 0) {
-            historyList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 3rem; color: var(--text-muted);">ไม่มีประวัติการแจ้งซ่อมในหมวดหมู่นี้</td></tr>';
+            historyList.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 3rem; color: var(--text-muted);" data-i18n="empty_history">ไม่มีประวัติการแจ้งซ่อมในหมวดหมู่นี้</td></tr>';
         } else {
             filtered.forEach(req => {
                 const tr = document.createElement('tr');
@@ -138,8 +138,8 @@ function renderRequests(filter = 'all') {
                     <td>${req.date}</td>
                     <td>${req.category || 'ทั่วไป'}</td>
                     <td>${req.title}</td>
-                    <td><span class="status-badge status-${req.status}">${req.statusText}</span></td>
-                    <td style="color: #fbbf24;">${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="openReviewModal(${req.id})">ประเมิน</button>`) : '-'}</td>
+                    <td><span class="status-badge status-${req.status}" data-i18n="status_${req.status}">${req.statusText}</span></td>
+                    <td style="color: #fbbf24;">${req.status === 'done' ? (req.reviewed ? renderStars(req.rating) : `<button class="btn btn-primary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="openReviewModal(${req.id})" data-i18n="btn_evaluate">ประเมิน</button>`) : '-'}</td>
                 `;
                 historyList.appendChild(tr);
             });
@@ -153,6 +153,15 @@ function filterRequests(status, btn) {
     btn.classList.add('active');
 
     renderRequests(status);
+}
+
+// Re-translate when adding new requests
+const origRenderRequests = renderRequests;
+renderRequests = function(filter) {
+    origRenderRequests(filter);
+    if (typeof changeLanguage === 'function') {
+        setTimeout(() => changeLanguage(localStorage.getItem('zeta_lang') || 'th'), 0);
+    }
 }
 
 function initSettingsPage() {

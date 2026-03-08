@@ -76,23 +76,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="stats-chart-outline"></ion-icon>
-                            <span>แดชบอร์ด</span>
+                            <span data-i18n="jur_nav_dashboard">แดชบอร์ด</span>
                         </a></li>
                     <li><a href="requests.html" class="nav-item">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>จัดการงานซ่อม</span>
+                            <span data-i18n="jur_nav_requests">จัดการงานซ่อม</span>
                         </a></li>
                     <li><a href="technicians.html" class="nav-item active">
                             <ion-icon name="people-outline"></ion-icon>
-                            <span>รายชื่อช่าง</span>
+                            <span data-i18n="jur_nav_techs">รายชื่อช่าง</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="jur_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="jur_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -100,20 +100,25 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout_jur">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center;">
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h1>รายชื่อช่างเทคนิค</h1>
-                    <p class="header-meta">จัดการรายชื่อและตรวจสอบสถานะการทำงานของช่างในโครงการ</p>
+                    <h1 data-i18n="jur_tech_title">รายชื่อช่างเทคนิค</h1>
+                    <p class="header-meta" data-i18n="jur_tech_meta">จัดการรายชื่อและตรวจสอบสถานะการทำงานของช่างในโครงการ</p>
                 </div>
-                <button class="btn btn-primary">
-                    <ion-icon name="add-outline" style="margin-right: 0.5rem;"></ion-icon> เพิ่มช่างใหม่
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px; margin-right: auto; margin-left: 20px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 10px;">
+                    <ion-icon name="add-outline" style="margin-right: 0.5rem;"></ion-icon> <span data-i18n="btn_add_tech">เพิ่มช่างใหม่</span>
                 </button>
             </header>
 
@@ -124,9 +129,9 @@
                         <ion-icon name="person"></ion-icon>
                     </div>
                     <div style="flex: 1;">
-                        <span class="availability-badge available">ว่าง</span>
+                        <span class="availability-badge available" data-i18n="badge_available">ว่าง</span>
                         <h3 style="margin: 0.5rem 0 0.2rem 0;">ช่างวิชัย</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">ผู้ชำนาญการ:
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;"><span data-i18n="tech_expertise">ผู้ชำนาญการ:</span>
                             ระบบประปา</p>
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
                             <ion-icon name="star" style="color: #fbbf24;"></ion-icon>
@@ -136,7 +141,7 @@
                             style="width: 100%; border: 1px solid var(--border); font-size: 0.8rem;"
                             onclick="openScheduleModal(1)">
                             <ion-icon name="calendar-number-outline" style="margin-right: 0.3rem;"></ion-icon>
-                            ดูตารางงาน
+                            <span data-i18n="btn_view_schedule">ดูตารางงาน</span>
                         </button>
                     </div>
                 </div>
@@ -146,9 +151,9 @@
                         <ion-icon name="person"></ion-icon>
                     </div>
                     <div style="flex: 1;">
-                        <span class="availability-badge busy">ติดงาน (1)</span>
+                        <span class="availability-badge busy" data-i18n="badge_busy">ติดงาน (1)</span>
                         <h3 style="margin: 0.5rem 0 0.2rem 0;">ช่างเกรียงไกร</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">ผู้ชำนาญการ:
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;"><span data-i18n="tech_expertise">ผู้ชำนาญการ:</span>
                             ระบบไฟฟ้า</p>
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
                             <ion-icon name="star" style="color: #fbbf24;"></ion-icon>
@@ -158,7 +163,7 @@
                             style="width: 100%; border: 1px solid var(--border); font-size: 0.8rem;"
                             onclick="openScheduleModal(2)">
                             <ion-icon name="calendar-number-outline" style="margin-right: 0.3rem;"></ion-icon>
-                            ดูตารางงาน
+                            <span data-i18n="btn_view_schedule">ดูตารางงาน</span>
                         </button>
                     </div>
                 </div>
@@ -168,9 +173,9 @@
                         <ion-icon name="person"></ion-icon>
                     </div>
                     <div style="flex: 1;">
-                        <span class="availability-badge available">ว่าง</span>
+                        <span class="availability-badge available" data-i18n="badge_available">ว่าง</span>
                         <h3 style="margin: 0.5rem 0 0.2rem 0;">ช่างสมหมาย</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">ผู้ชำนาญการ:
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;"><span data-i18n="tech_expertise">ผู้ชำนาญการ:</span>
                             งานโครงสร้าง</p>
                         <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
                             <ion-icon name="star" style="color: #fbbf24;"></ion-icon>
@@ -180,7 +185,7 @@
                             style="width: 100%; border: 1px solid var(--border); font-size: 0.8rem;"
                             onclick="openScheduleModal(3)">
                             <ion-icon name="calendar-number-outline" style="margin-right: 0.3rem;"></ion-icon>
-                            ดูตารางงาน
+                            <span data-i18n="btn_view_schedule">ดูตารางงาน</span>
                         </button>
                     </div>
                 </div>
@@ -188,6 +193,7 @@
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

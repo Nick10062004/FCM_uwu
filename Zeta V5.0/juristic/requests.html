@@ -70,23 +70,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="stats-chart-outline"></ion-icon>
-                            <span>แดชบอร์ด</span>
+                            <span data-i18n="jur_nav_dashboard">แดชบอร์ด</span>
                         </a></li>
                     <li><a href="requests.html" class="nav-item active">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>จัดการงานซ่อม</span>
+                            <span data-i18n="jur_nav_requests">จัดการงานซ่อม</span>
                         </a></li>
                     <li><a href="technicians.html" class="nav-item">
                             <ion-icon name="people-outline"></ion-icon>
-                            <span>รายชื่อช่าง</span>
+                            <span data-i18n="jur_nav_techs">รายชื่อช่าง</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="jur_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="jur_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -94,23 +94,28 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout_jur">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center;">
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h1>จัดการรายการแจ้งซ่อม</h1>
-                    <p class="header-meta">ตรวจสอบและอนุมัติรายการแจ้งซ่อมจากลูกบ้านทั้งหมด</p>
+                    <h1 data-i18n="jur_req_title">จัดการรายการแจ้งซ่อม</h1>
+                    <p class="header-meta" data-i18n="jur_req_meta">ตรวจสอบและอนุมัติรายการแจ้งซ่อมจากลูกบ้านทั้งหมด</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px; margin-right: auto; margin-left: 20px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
                 </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <div class="search-box"
                         style="background: var(--bg-card); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <ion-icon name="search-outline"></ion-icon>
-                        <input type="text" placeholder="หาตามบ้านเลขที่ หรือหัวข้อ..."
+                        <input type="text" placeholder="หาตามบ้านเลขที่ หรือหัวข้อ..." data-i18n="search_placeholder"
                             style="border: none; outline: none; font-size: 0.9rem;">
                     </div>
                 </div>
@@ -120,7 +125,7 @@
             <!-- Internal Task Section (v4.1) - Positioned under header -->
             <section id="internalTaskSection" style="margin-bottom: 2rem; display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2 style="font-size: 1.1rem; color: #6366f1; display: flex; align-items: center; gap: 0.5rem;">
+                    <h2 style="font-size: 1.1rem; color: #6366f1; display: flex; align-items: center; gap: 0.5rem;" data-i18n="internal_tasks_title">
                         <ion-icon name="construct-outline"></ion-icon> งานซ่อมส่วนกลางที่กำลังดำเนินการ
                     </h2>
                 </div>
@@ -136,21 +141,21 @@
                     style="padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
                     <div style="display: flex; gap: 2rem;">
                         <span class="tab-item active" data-filter="all"
-                            style="font-weight: 600; color: var(--juristic-accent); border-bottom: 2px solid var(--juristic-accent); padding-bottom: 0.5rem; cursor: pointer;">ทั้งหมด
+                            style="font-weight: 600; color: var(--juristic-accent); border-bottom: 2px solid var(--juristic-accent); padding-bottom: 0.5rem; cursor: pointer;"><span data-i18n="filter_all">ทั้งหมด</span>
                             <span class="count-badge"></span></span>
                         <span class="tab-item" data-filter="pending"
-                            style="font-weight: 600; color: var(--text-muted); padding-bottom: 0.5rem; cursor: pointer;">รออนุมัติ
+                            style="font-weight: 600; color: var(--text-muted); padding-bottom: 0.5rem; cursor: pointer;"><span data-i18n="stat_pending">รออนุมัติ</span>
                             <span class="count-badge"></span></span>
                         <span class="tab-item" data-filter="working"
-                            style="font-weight: 600; color: var(--text-muted); padding-bottom: 0.5rem; cursor: pointer;">กำลังดำเนินการ
+                            style="font-weight: 600; color: var(--text-muted); padding-bottom: 0.5rem; cursor: pointer;"><span data-i18n="stat_working">กำลังดำเนินการ</span>
                             <span class="count-badge"></span></span>
                         <span class="tab-item" data-filter="done"
-                            style="font-weight: 600; color: var(--text-muted); padding-bottom: 0.5rem; cursor: pointer;">เสร็จสิ้น
+                            style="font-weight: 600; color: var(--text-muted); padding-bottom: 0.5rem; cursor: pointer;"><span data-i18n="stat_done">เสร็จสิ้น</span>
                             <span class="count-badge"></span></span>
                     </div>
                     <button class="btn btn-primary" onclick="openInternalTaskModal()"
                         style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.8rem; font-size: 0.85rem; height: fit-content;">
-                        <ion-icon name="add-outline"></ion-icon> งานส่วนกลาง
+                        <ion-icon name="add-outline"></ion-icon> <span data-i18n="btn_add_internal">งานส่วนกลาง</span>
                     </button>
                 </div>
 
@@ -165,7 +170,7 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
         <div class="card" style="max-width: 600px; width: 100%; max-height: 95vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2>มอบหมายงานช่าง</h2>
+                <h2 data-i18n="modal_assign_title">มอบหมายงานช่าง</h2>
                 <ion-icon name="close-outline" style="font-size: 1.5rem; cursor: pointer;"
                     onclick="closeAssignModal()"></ion-icon>
             </div>
@@ -175,16 +180,16 @@
                 <div
                     style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
                     <ion-icon name="calendar-outline"></ion-icon>
-                    <span>วันที่ลูกบ้านสะดวก:</span>
+                    <span data-i18n="resident_preferred_date">วันที่ลูกบ้านสะดวก:</span>
                 </div>
                 <div id="preferredDateDisplay"
-                    style="font-weight: 600; margin-top: 0.2rem; color: var(--juristic-primary);">
+                    style="font-weight: 600; margin-top: 0.2rem; color: var(--juristic-primary);" data-i18n="loading_data">
                     กำลังโหลด...
                 </div>
             </div>
 
             <div class="form-group" style="margin-top: 1rem;">
-                <label>เลือกช่างที่จะมอบหมาย (คลิกที่การ์ดเพื่อเลือก)</label>
+                <label data-i18n="select_tech">เลือกช่างที่จะมอบหมาย (คลิกที่การ์ดเพื่อเลือก)</label>
                 <div id="assignTechChecklist"
                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: 0.5rem; padding: 0.8rem; border: 1px solid var(--border); border-radius: 1rem; background: #fafafa;">
                     <!-- Tech profile cards will be rendered here -->
@@ -193,7 +198,7 @@
 
             <div id="multiCalendarContainer"
                 style="margin-top: 1.5rem; display: none; padding-top: 1.5rem; border-top: 1px dashed var(--border);">
-                <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;">ตรวจสอบความพร้อมของช่างที่เลือก:
+                <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem;" data-i18n="check_tech_ready">ตรวจสอบความพร้อมของช่างที่เลือก:
                 </p>
                 <div id="techCalendarsGrid" style="display: flex; flex-direction: column; gap: 2rem;">
                     <!-- Multiple calendars will appear here -->
@@ -202,8 +207,8 @@
 
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                 <button class="btn" style="flex: 1; border: 1px solid var(--border);"
-                    onclick="closeAssignModal()">ยกเลิก</button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="confirmAssignment()">ยืนยันการมอบหมาย</button>
+                    onclick="closeAssignModal()" data-i18n="btn_cancel">ยกเลิก</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="confirmAssignment()"><span data-i18n="btn_confirm_assign">ยืนยันการมอบหมาย</span></button>
             </div>
         </div>
     </div>
@@ -213,43 +218,43 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div class="card" style="max-width: 500px; width: 90%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="color: #ef4444;">ปฏิเสธการแจ้งซ่อม</h2>
+                <h2 style="color: #ef4444;" data-i18n="modal_deny_title">ปฏิเสธการแจ้งซ่อม</h2>
                 <ion-icon name="close-outline" style="font-size: 1.5rem; cursor: pointer;"
                     onclick="closeDenyModal()"></ion-icon>
             </div>
 
             <div class="form-group">
-                <label>เหตุผลในการปฏิเสธ (จำเป็น)</label>
+                <label data-i18n="deny_reason_label">เหตุผลในการปฏิเสธ (จำเป็น)</label>
                 <textarea id="denyReason" class="input-light" rows="4" placeholder="ระบุเหตุผลเพื่อให้ลูกบ้านทราบ..."
-                    style="width: 100%; padding: 0.8rem; border-radius: 0.8rem; border: 1px solid var(--border); resize: none;"></textarea>
+                    style="width: 100%; padding: 0.8rem; border-radius: 0.8rem; border: 1px solid var(--border); resize: none;" data-i18n="deny_reason_placeholder"></textarea>
             </div>
 
             <div style="margin-bottom: 2rem;">
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">เลือกจากแม่แบบ:</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;" data-i18n="select_template">เลือกจากแม่แบบ:</p>
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                     <button class="btn"
                         style="font-size: 0.8rem; text-align: left; padding: 0.8rem; border: 1px solid var(--border);"
-                        onclick="setDenyTemplate('ขออภัย เราไม่สามารถดำเนินการซ่อมตามคำขอของคุณได้ในขณะนี้ เนื่องจากอยู่นอกหน้ารับผิดชอบของโครงการ')">
-                        ❌ นอกความรับผิดชอบโครงการ
+                        onclick="setDenyTemplate('❌ นอกความรับผิดชอบโครงการ')">
+                        <span data-i18n="template_1">❌ นอกความรับผิดชอบโครงการ</span>
                     </button>
                     <button class="btn"
                         style="font-size: 0.8rem; text-align: left; padding: 0.8rem; border: 1px solid var(--border);"
-                        onclick="setDenyTemplate('เจ้าหน้าที่ตรวจสอบแล้วพบว่าอุปกรณ์ไม่ได้ชำรุด หรือเป็นการใช้งานผิดประเภท')">
-                        ⚠️ อุปกรณ์ปกติ/ใช้งานผิดประเภท
+                        onclick="setDenyTemplate('⚠️ อุปกรณ์ปกติ/ใช้งานผิดประเภท')">
+                        <span data-i18n="template_2">⚠️ อุปกรณ์ปกติ/ใช้งานผิดประเภท</span>
                     </button>
                     <button class="btn"
                         style="font-size: 0.8rem; text-align: left; padding: 0.8rem; border: 1px solid var(--border);"
-                        onclick="setDenyTemplate('ข้อมูลที่แจ้งไม่ชัดเจน โปรดแจ้งรายละเอียดหรือแนบรูปถ่ายเพิ่มเติมและส่งเรื่องมาใหม่อีกครั้ง')">
-                        📝 ข้อมูลไม่ชัดเจน
+                        onclick="setDenyTemplate('📝 ข้อมูลไม่ชัดเจน')">
+                        <span data-i18n="template_3">📝 ข้อมูลไม่ชัดเจน</span>
                     </button>
                 </div>
             </div>
 
             <div style="display: flex; gap: 1rem;">
                 <button class="btn" style="flex: 1; border: 1px solid var(--border);"
-                    onclick="closeDenyModal()">ยกเลิก</button>
+                    onclick="closeDenyModal()" data-i18n="btn_cancel">ยกเลิก</button>
                 <button class="btn" style="flex: 1; background: #ef4444; color: white;"
-                    onclick="confirmDeny()">ยืนยันปฏิเสธ</button>
+                    onclick="confirmDeny()"><span data-i18n="btn_confirm_deny">ยืนยันปฏิเสธ</span></button>
             </div>
         </div>
     </div>
@@ -258,37 +263,37 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
         <div class="card" style="max-width: 600px; width: 100%; max-height: 95vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2>เพิ่มงานซ่อมส่วนกลาง</h2>
+                <h2 data-i18n="modal_internal_title">เพิ่มงานซ่อมส่วนกลาง</h2>
                 <ion-icon name="close-outline" style="font-size: 1.5rem; cursor: pointer;"
                     onclick="closeInternalTaskModal()"></ion-icon>
             </div>
 
             <div class="form-group">
-                <label>ชื่อรายการ / สิ่งที่ต้องซ่อม</label>
-                <input type="text" id="internalTitle" class="input-light" placeholder="เช่น ซ่อมไฟสนาม, ล้างสระว่ายน้ำ"
+                <label data-i18n="internal_title_label">ชื่อรายการ / สิ่งที่ต้องซ่อม</label>
+                <input type="text" id="internalTitle" class="input-light" placeholder="เช่น ซ่อมไฟสนาม, ล้างสระว่ายน้ำ" data-i18n="internal_title_placeholder"
                     style="width: 100%; padding: 0.8rem; border-radius: 0.8rem; border: 1px solid var(--border);">
             </div>
 
             <div class="form-group">
-                <label>พื้นที่ส่วนกลาง</label>
+                <label data-i18n="location_label">พื้นที่ส่วนกลาง</label>
                 <select id="internalLocation" class="input-light"
                     style="width: 100%; padding: 0.8rem; border-radius: 0.8rem; border: 1px solid var(--border);">
-                    <option value="สวนสาธารณะ">สวนสาธารณะ</option>
-                    <option value="สโมสร / ยิม">สโมสร / ยิม</option>
-                    <option value="สระว่ายน้ำ">สระว่ายน้ำ</option>
-                    <option value="ป้อมยาม / ทางเข้า">ป้อมยาม / ทางเข้า</option>
-                    <option value="ไฟฟ้าส่วนกลาง">ไฟฟ้าส่วนกลาง</option>
+                    <option value="สวนสาธารณะ" data-i18n="loc_park">สวนสาธารณะ</option>
+                    <option value="สโมสร / ยิม" data-i18n="loc_gym">สโมสร / ยิม</option>
+                    <option value="สระว่ายน้ำ" data-i18n="loc_pool">สระว่ายน้ำ</option>
+                    <option value="ป้อมยาม / ทางเข้า" data-i18n="loc_gate">ป้อมยาม / ทางเข้า</option>
+                    <option value="ไฟฟ้าส่วนกลาง" data-i18n="loc_electric">ไฟฟ้าส่วนกลาง</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label>รายละเอียดเพิ่มเติม</label>
+                <label data-i18n="details_label">รายละเอียดเพิ่มเติม</label>
                 <textarea id="internalDetails" class="input-light" rows="3"
                     style="width: 100%; padding: 0.8rem; border-radius: 0.8rem; border: 1px solid var(--border); resize: none;"></textarea>
             </div>
 
             <div class="form-group" style="margin-top: 1rem;">
-                <label>เลือกช่างและตรวจสอบตารางงาน (คลิกที่การ์ดเพื่อเลือก)</label>
+                <label data-i18n="select_tech_time">เลือกช่างและตรวจสอบตารางงาน (คลิกที่การ์ดเพื่อเลือก)</label>
                 <div id="internalTechChecklist"
                     style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin-top: 0.5rem; padding: 0.8rem; border: 1px solid var(--border); border-radius: 1rem; background: #fafafa;">
                     <!-- Tech profile cards will be rendered here -->
@@ -304,12 +309,13 @@
 
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
                 <button class="btn" style="flex: 1; border: 1px solid var(--border);"
-                    onclick="closeInternalTaskModal()">ยกเลิก</button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="submitInternalTask()">สร้างรายการ</button>
+                    onclick="closeInternalTaskModal()" data-i18n="btn_cancel">ยกเลิก</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="submitInternalTask()"><span data-i18n="btn_create_task">สร้างรายการ</span></button>
             </div>
         </div>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
     <script>
         // Tab switching logic

@@ -31,19 +31,19 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>รายการงาน</span>
+                            <span data-i18n="tech_nav_tasks">รายการงาน</span>
                         </a></li>
                     <li><a href="calendar.html" class="nav-item active">
                             <ion-icon name="calendar-outline"></ion-icon>
-                            <span>ตารางงาน</span>
+                            <span data-i18n="tech_nav_calendar">ตารางงาน</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="tech_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="tech_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -51,16 +51,23 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>ตารางงานของคุณ</h1>
-                <p class="header-meta">ตรวจสอบตารางการนัดหมายและวางแผนการทำงาน</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="tech_cal_title">ตารางงานของคุณ</h1>
+                    <p class="header-meta" data-i18n="tech_cal_meta">ตรวจสอบตารางการนัดหมายและวางแผนการทำงาน</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start;">
@@ -74,13 +81,13 @@
                     style="background: var(--bg-main); border-style: dashed;">
                     <div style="padding: 3rem; text-align: center; color: var(--text-muted);">
                         <ion-icon name="calendar-outline" style="font-size: 2.5rem; margin-bottom: 1rem;"></ion-icon>
-                        <p>เลือกวันที่บนปฏิทินเพื่อดูรายการงาน</p>
+                        <p data-i18n="tech_cal_select">เลือกวันที่บนปฏิทินเพื่อดูรายการงาน</p>
                     </div>
                 </div>
             </div>
 
             <div class="card" style="margin-top: 2rem;">
-                <h3>รายการที่ใกล้ถึงกำหนด</h3>
+                <h3 data-i18n="tech_cal_upcoming">รายการที่ใกล้ถึงกำหนด</h3>
                 <div id="upcomingTasksList" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 1rem;">
                     <!-- Upcoming tasks will be listed here -->
                 </div>
@@ -88,6 +95,7 @@
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

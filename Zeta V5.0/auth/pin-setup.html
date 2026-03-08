@@ -20,8 +20,8 @@
 <body class="auth-page">
     <div class="card animate-fade-in" style="width: 400px; padding: 3rem; text-align: center;">
         <div class="auth-header">
-            <h1 style="font-size: 1.8rem;">ตั้งรหัส PIN</h1>
-            <p style="color: var(--text-muted);">กำหนดรหัสผ่าน 6 หลักเพื่อความรวดเร็วในการเข้าใช้งานครั้งต่อไป</p>
+            <h1 style="font-size: 1.8rem;" data-i18n="pin_setup_header">ตั้งรหัส PIN</h1>
+            <p style="color: var(--text-muted);" data-i18n="pin_setup_desc">กำหนดรหัสผ่าน 6 หลักเพื่อความรวดเร็วในการเข้าใช้งานครั้งต่อไป</p>
         </div>
 
         <div class="pin-display" id="pinDisplay">
@@ -51,11 +51,12 @@
         </div>
 
         <button id="btn-save-pin" class="btn btn-primary"
-            style="width: 100%; padding: 1rem; margin-top: 2rem; font-size: 1rem;" disabled onclick="savePin()">
+            style="width: 100%; padding: 1rem; margin-top: 2rem; font-size: 1rem;" disabled onclick="savePin()" data-i18n="btn_save_pin">
             บันทึกรหัส PIN
         </button>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

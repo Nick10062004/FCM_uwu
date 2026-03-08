@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/data/auth_repository.dart';
 
 class JuristicViewScreen extends StatefulWidget {
   const JuristicViewScreen({super.key});
@@ -157,8 +158,10 @@ class _JuristicViewScreenState extends State<JuristicViewScreen> {
           Padding(
             padding: const EdgeInsets.all(24),
             child: OutlinedButton.icon(
-              onPressed: () =>
-                  Navigator.pushReplacementNamed(context, '/login'),
+              onPressed: () async {
+                await AuthRepository.instance.logout();
+                if (mounted) Navigator.pushReplacementNamed(context, '/login');
+              },
               icon: const Icon(Icons.logout_rounded, size: 18),
               label: Text("ออกจากระบบ", style: GoogleFonts.kanit()),
               style: OutlinedButton.styleFrom(
@@ -305,8 +308,10 @@ class _JuristicViewScreenState extends State<JuristicViewScreen> {
                   border: Border.all(color: Colors.red.withOpacity(0.1)),
                 ),
                 child: TextButton.icon(
-                  onPressed: () =>
-                      Navigator.pushReplacementNamed(context, '/login'),
+                  onPressed: () async {
+                    await AuthRepository.instance.logout();
+                    if (mounted) Navigator.pushReplacementNamed(context, '/login');
+                  },
                   icon: const Icon(Icons.logout,
                       color: Colors.redAccent, size: 18),
                   label: Text("ออกจากระบบ (Admin)",

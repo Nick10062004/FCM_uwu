@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../core/data/auth_repository.dart';
 
 class ModelViewScreen extends StatefulWidget {
   final String username;
@@ -302,8 +303,10 @@ class _ModelViewScreenState extends State<ModelViewScreen> {
                 _profileRow('อีเมล', 'somchai.r@email.com'),
                 const SizedBox(height: 24),
                 OutlinedButton(
-                    onPressed: () =>
-                        Navigator.pushReplacementNamed(context, '/login'),
+                    onPressed: () async {
+                      await AuthRepository.instance.logout();
+                      if (mounted) Navigator.pushReplacementNamed(context, '/login');
+                    },
                     child: Text('ออกจากระบบ')),
               ],
             ),

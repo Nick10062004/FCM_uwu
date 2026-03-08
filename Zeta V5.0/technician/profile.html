@@ -31,19 +31,19 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>รายการงาน</span>
+                            <span data-i18n="tech_nav_tasks">รายการงาน</span>
                         </a></li>
                     <li><a href="calendar.html" class="nav-item">
                             <ion-icon name="calendar-outline"></ion-icon>
-                            <span>ตารางงาน</span>
+                            <span data-i18n="tech_nav_calendar">ตารางงาน</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item active">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="tech_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="tech_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -51,55 +51,62 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout_tech">ออกจากระบบ (ช่าง)</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>โปรไฟล์ของฉัน</h1>
-                <p class="header-meta">จัดการข้อมูลส่วนตัวและทักษะความเชี่ยวชาญ</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="tech_profile_title">โปรไฟล์ของฉัน</h1>
+                    <p class="header-meta" data-i18n="tech_profile_meta">จัดการข้อมูลส่วนตัวและทักษะความเชี่ยวชาญ</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div style="max-width: 800px; margin: 0 auto;">
                 <section class="card profile-card animate-fade-in">
                     <div class="profile-avatar" style="background: var(--gold); color: #1e293b;">W</div>
-                    <h2 style="margin-bottom: 0.5rem;">วิชัย ช่างทอง</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 1rem;">ช่างประจำโครงการ (Technician)</p>
+                    <h2 style="margin-bottom: 0.5rem;" data-i18n="tech_profile_name">วิชัย ช่างทอง</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 1rem;" data-i18n="tech_profile_role">ช่างประจำโครงการ (Technician)</p>
 
                     <div style="display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 2rem;">
-                        <span class="category-tag" style="background: #dcfce7; color: #166534;">เชี่ยวชาญไฟฟ้า</span>
-                        <span class="category-tag" style="background: #dcfce7; color: #166534;">หัวหน้าทีม</span>
+                        <span class="category-tag" style="background: #dcfce7; color: #166534;" data-i18n="tech_tag_electric">เชี่ยวชาญไฟฟ้า</span>
+                        <span class="category-tag" style="background: #dcfce7; color: #166534;" data-i18n="tech_tag_lead">หัวหน้าทีม</span>
                     </div>
 
                     <div class="profile-info-grid" style="width: 100%; text-align: left;">
                         <div class="info-item">
-                            <span class="info-label">รหัสช่าง</span>
+                            <span class="info-label" data-i18n="tech_info_id">รหัสช่าง</span>
                             <span class="info-value">TECH-001</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">เบอร์โทรศัพท์</span>
+                            <span class="info-label" data-i18n="info_phone">เบอร์โทรศัพท์</span>
                             <div>
                                 <span class="info-value">082-XXX-XXXX</span>
-                                <span class="edit-link"
+                                <span class="edit-link" data-i18n="btn_edit"
                                     onclick="openEditModal('phone', 'เบอร์โทรศัพท์', '082-XXX-XXXX')">แก้ไข</span>
                             </div>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">อีเมล</span>
+                            <span class="info-label" data-i18n="info_email">อีเมล</span>
                             <div>
                                 <span class="info-value">technician@gmail.com</span>
-                                <span class="edit-link"
+                                <span class="edit-link" data-i18n="btn_edit"
                                     onclick="openEditModal('email', 'อีเมล', 'technician@gmail.com')">แก้ไข</span>
                             </div>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">รหัสผ่าน</span>
+                            <span class="info-label" data-i18n="info_password">รหัสผ่าน</span>
                             <div>
                                 <span class="info-value">********</span>
-                                <span class="edit-link"
+                                <span class="edit-link" data-i18n="btn_change_pass"
                                     onclick="openEditModal('password', 'รหัสผ่าน', '********')">เปลี่ยนรหัส</span>
                             </div>
                         </div>
@@ -107,7 +114,7 @@
 
                     <button class="btn btn-logout" onclick="confirmLogout()">
                         <ion-icon name="log-out-outline" style="margin-right: 0.5rem;"></ion-icon>
-                        ออกจากระบบ (ช่าง)
+                        <span data-i18n="btn_logout_tech">ออกจากระบบ (ช่าง)</span>
                     </button>
                 </section>
             </div>
@@ -119,23 +126,24 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="editModalTitle">แก้ไขข้อมูล</h3>
+                <h3 id="editModalTitle" data-i18n="modal_edit_title">แก้ไขข้อมูล</h3>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editTypeHidden">
                 <div class="form-group">
-                    <label id="editInputLabel">ข้อมูล</label>
+                    <label id="editInputLabel" data-i18n="modal_edit_label">ข้อมูล</label>
                     <input type="text" id="editInputValue" class="input-light" style="width: 100%; margin-top: 0.5rem;">
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn" style="flex: 1; border: 1px solid var(--border);"
-                    onclick="closeEditModal()">ยกเลิก</button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="saveProfileChange()">บันทึก</button>
+                    onclick="closeEditModal()" data-i18n="btn_cancel">ยกเลิก</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="saveProfileChange()" data-i18n="btn_save">บันทึก</button>
             </div>
         </div>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

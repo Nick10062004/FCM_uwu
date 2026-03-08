@@ -32,23 +32,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item active">
                             <ion-icon name="grid-outline"></ion-icon>
-                            <span>หน้าหลัก</span>
+                            <span data-i18n="nav_home">หน้าหลัก</span>
                         </a></li>
                     <li><a href="repair.html" class="nav-item">
                             <ion-icon name="hammer-outline"></ion-icon>
-                            <span>แจ้งซ่อม</span>
+                            <span data-i18n="nav_repair">แจ้งซ่อม</span>
                         </a></li>
                     <li><a href="history.html" class="nav-item">
                             <ion-icon name="list-outline"></ion-icon>
-                            <span>ประวัติการซ่อม</span>
+                            <span data-i18n="nav_history">ประวัติการซ่อม</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -56,16 +56,23 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>ยินดีต้อนรับสู่บ้านของคุณ</h1>
-                <p class="header-meta">บ้านเลขที่ 123/45 | สถานะ: ปกติ</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="welcome_home">ยินดีต้อนรับสู่บ้านของคุณ</h1>
+                    <p class="header-meta" data-i18n="home_status_ok">บ้านเลขที่ 123/45 | สถานะ: ปกติ</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <!-- Main Content Area: 3D Model & Announcements -->
@@ -76,8 +83,8 @@
                     <div class="model-placeholder" style="text-align: center; z-index: 2;">
                         <ion-icon name="cube-outline"
                             style="font-size: 8rem; color: var(--primary); opacity: 0.2; transform: rotate(15deg);"></ion-icon>
-                        <h2 style="margin-top: 1rem; color: var(--text-muted);">[ 3D House Model View ]</h2>
-                        <p style="color: var(--text-muted); max-width: 400px; margin: 1rem auto;">
+                        <h2 style="margin-top: 1rem; color: var(--text-muted);" data-i18n="3d_model_view">[ 3D House Model View ]</h2>
+                        <p style="color: var(--text-muted); max-width: 400px; margin: 1rem auto;" data-i18n="3d_model_desc">
                             ในอนาคตคุณจะสามารถหมุนดูโมเดลบ้าน 3 มิติ และคลิกที่จุดต่างๆ ของบ้านเพื่อแจ้งซ่อมได้ทันที</p>
                     </div>
 
@@ -98,40 +105,41 @@
                     <div
                         style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; color: var(--primary);">
                         <ion-icon name="megaphone-outline" size="large"></ion-icon>
-                        <h3 style="margin: 0;">ประกาศหมู่บ้าน</h3>
+                        <h3 style="margin: 0;" data-i18n="announcements">ประกาศหมู่บ้าน</h3>
                     </div>
                     <div style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
                         <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
                             <span class="status-badge"
                                 style="background: #eff6ff; color: var(--primary); margin-bottom: 0.5rem; display: inline-block;">15
                                 ก.พ. 2569</span>
-                            <p style="font-weight: 600; font-size: 0.95rem;">ล้างแท็งก์น้ำส่วนกลาง</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">จะมีการปิดน้ำชั่วคราวเวลา 09:00 -
+                            <p style="font-weight: 600; font-size: 0.95rem;" data-i18n="announcement_1_title">ล้างแท็งก์น้ำส่วนกลาง</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);" data-i18n="announcement_1_desc">จะมีการปิดน้ำชั่วคราวเวลา 09:00 -
                                 12:00 น.</p>
                         </div>
                         <div style="padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
                             <span class="status-badge"
                                 style="background: #fff7ed; color: #c2410c; margin-bottom: 0.5rem; display: inline-block;">20
                                 ก.พ. 2569</span>
-                            <p style="font-weight: 600; font-size: 0.95rem;">ฉีดพ่นยากำจัดยุง</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                            <p style="font-weight: 600; font-size: 0.95rem;" data-i18n="announcement_2_title">ฉีดพ่นยากำจัดยุง</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);" data-i18n="announcement_2_desc">
                                 กรุณาปิดหน้าต่างและประตูบ้านให้มิดชิด</p>
                         </div>
                         <div style="padding-bottom: 1rem;">
                             <span class="status-badge"
                                 style="background: #f0fdf4; color: #166534; margin-bottom: 0.5rem; display: inline-block;">25
                                 ก.พ. 2569</span>
-                            <p style="font-weight: 600; font-size: 0.95rem;">ประชุมใหญ่สามัญประจำปี</p>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">ณ สโมสรส่วนกลาง เวลา 18:00 น.
+                            <p style="font-weight: 600; font-size: 0.95rem;" data-i18n="announcement_3_title">ประชุมใหญ่สามัญประจำปี</p>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);" data-i18n="announcement_3_desc">ณ สโมสรส่วนกลาง เวลา 18:00 น.
                                 เป็นต้นไป</p>
                         </div>
                     </div>
                     <button class="btn"
-                        style="margin-top: auto; border: 1px solid var(--border); font-size: 0.85rem;">ดูทั้งหมด</button>
+                        style="margin-top: auto; border: 1px solid var(--border); font-size: 0.85rem;" data-i18n="btn_view_all">ดูทั้งหมด</button>
                 </div>
             </section>
         </main>
     </div>
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

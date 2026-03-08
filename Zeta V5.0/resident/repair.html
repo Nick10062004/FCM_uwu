@@ -32,23 +32,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="grid-outline"></ion-icon>
-                            <span>หน้าหลัก</span>
+                            <span data-i18n="nav_home">หน้าหลัก</span>
                         </a></li>
                     <li><a href="repair.html" class="nav-item active">
                             <ion-icon name="hammer-outline"></ion-icon>
-                            <span>แจ้งซ่อม</span>
+                            <span data-i18n="nav_repair">แจ้งซ่อม</span>
                         </a></li>
                     <li><a href="history.html" class="nav-item">
                             <ion-icon name="list-outline"></ion-icon>
-                            <span>ประวัติการซ่อม</span>
+                            <span data-i18n="nav_history">ประวัติการซ่อม</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -56,60 +56,67 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>แจ้งซ่อม</h1>
-                <p class="header-meta">จัดการคำขอแจ้งซ่อมและตรวจสอบสถานะการรับประกัน</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="repair_title">แจ้งซ่อม</h1>
+                    <p class="header-meta" data-i18n="repair_meta">จัดการคำขอแจ้งซ่อมและตรวจสอบสถานะการรับประกัน</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div class="grid-2">
                 <!-- New Request Form -->
                 <section class="card animate-fade-in">
-                    <h3 style="margin-bottom: 1.5rem;">แจ้งซ่อมใหม่</h3>
+                    <h3 style="margin-bottom: 1.5rem;" data-i18n="repair_new_req">แจ้งซ่อมใหม่</h3>
                     <form id="repairForm">
                         <div class="form-group">
-                            <label>เลือกรายการที่ต้องการซ่อม</label>
+                            <label data-i18n="repair_select">เลือกรายการที่ต้องการซ่อม</label>
                             <select required>
-                                <option value="">เลือกอุปกรณ์...</option>
-                                <optgroup label="ห้องน้ำ">
+                                <option value="" data-i18n="repair_select_placeholder">เลือกอุปกรณ์...</option>
+                                <optgroup label="ห้องน้ำ" data-i18n="cat_bathroom">
                                     <option>อ่างอาบน้ำ</option>
                                     <option>โถชำระ</option>
                                     <option>เครื่องทำน้ำอุ่น</option>
                                 </optgroup>
-                                <optgroup label="ห้องครัว">
+                                <optgroup label="ห้องครัว" data-i18n="cat_kitchen">
                                     <option>ตู้เย็น</option>
                                     <option>เตาอบ</option>
                                     <option>เครื่องล้างจาน</option>
                                 </optgroup>
-                                <optgroup label="ห้องนั่งเล่น">
+                                <optgroup label="ห้องนั่งเล่น" data-i18n="cat_living">
                                     <option>เครื่องปรับอากาศ</option>
                                     <option>โทรทัศน์</option>
                                 </optgroup>
-                                <option value="other">อื่นๆ (ระบุในรายละเอียด)</option>
+                                <option value="other" data-i18n="repair_other">อื่นๆ (ระบุในรายละเอียด)</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>หัวข้อปัญหา</label>
-                            <input type="text" placeholder="ระบุหัวข้อปัญหาเบื้องต้น..." required>
+                            <label data-i18n="repair_issue">หัวข้อปัญหา</label>
+                            <input type="text" placeholder="ระบุหัวข้อปัญหาเบื้องต้น..." data-i18n-placeholder="repair_issue_placeholder" required>
                         </div>
                         <div class="form-group">
-                            <label>วันที่สะดวกให้เข้าซ่อม</label>
+                            <label data-i18n="repair_date">วันที่สะดวกให้เข้าซ่อม</label>
                             <input type="date" id="preferredDate" required>
                         </div>
                         <div class="form-group">
-                            <label>รายละเอียดเพิ่มเติม</label>
+                            <label data-i18n="repair_detail">รายละเอียดเพิ่มเติม</label>
                             <textarea id="repairDetail" rows="4"
-                                placeholder="อธิบายอาการหรือจุดที่ต้องการให้ซ่อม..."></textarea>
+                                placeholder="อธิบายอาการหรือจุดที่ต้องการให้ซ่อม..." data-i18n-placeholder="repair_detail_placeholder"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%;">
                             <ion-icon name="paper-plane-outline" style="margin-right: 0.5rem;"></ion-icon>
-                            ส่งคำขอแจ้งซ่อม
+                            <span data-i18n="btn_send_req">ส่งคำขอแจ้งซ่อม</span>
                         </button>
                     </form>
                 </section>
@@ -118,26 +125,26 @@
                 <section class="card animate-fade-in" style="animation-delay: 0.1s;">
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-                        <h3>สถานะการซ่อมปัจจุบัน</h3>
+                        <h3 data-i18n="repair_status">สถานะการซ่อมปัจจุบัน</h3>
                     </div>
 
                     <div class="category-tabs" style="margin-bottom: 1.5rem; justify-content: flex-start;">
                         <button class="tab-btn status-filter-btn active"
-                            onclick="filterRequests('all', this)">ทั้งหมด</button>
+                            onclick="filterRequests('all', this)" data-i18n="filter_all">ทั้งหมด</button>
                         <button class="tab-btn status-filter-btn"
-                            onclick="filterRequests('pending', this)">รออนุมัติ</button>
+                            onclick="filterRequests('pending', this)" data-i18n="filter_pending">รออนุมัติ</button>
                         <button class="tab-btn status-filter-btn"
-                            onclick="filterRequests('working', this)">กำลังดำเนินการ</button>
+                            onclick="filterRequests('working', this)" data-i18n="filter_working">กำลังดำเนินการ</button>
                         <button class="tab-btn status-filter-btn"
-                            onclick="filterRequests('done', this)">เสร็จสิ้น</button>
+                            onclick="filterRequests('done', this)" data-i18n="filter_done">เสร็จสิ้น</button>
                     </div>
 
                     <div style="max-height: 400px; overflow-y: auto;">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>รายการ</th>
-                                    <th>สถานะ</th>
+                                    <th data-i18n="col_item">รายการ</th>
+                                    <th data-i18n="col_status">สถานะ</th>
                                 </tr>
                             </thead>
                             <tbody id="requestList">
@@ -157,15 +164,15 @@
 
             <!-- Furniture & Warranty Section (v1.1) -->
             <section class="furniture-section animate-fade-in" style="animation-delay: 0.2s;">
-                <h3 style="margin-bottom: 1.5rem;">รายการเฟอร์นิเจอร์และอุปกรณ์ในบ้าน</h3>
+                <h3 style="margin-bottom: 1.5rem;" data-i18n="furniture_list">รายการเฟอร์นิเจอร์และอุปกรณ์ในบ้าน</h3>
 
                 <div class="category-tabs">
-                    <button class="tab-btn active" data-category="all">ทั้งหมด</button>
-                    <button class="tab-btn" data-category="bathroom">ห้องน้ำ</button>
-                    <button class="tab-btn" data-category="kitchen">ห้องครัว</button>
-                    <button class="tab-btn" data-category="living">ห้องนั่งเล่น</button>
-                    <button class="tab-btn" data-category="bedroom">ห้องนอน</button>
-                    <button class="tab-btn" data-category="other">อื่นๆ</button>
+                    <button class="tab-btn active" data-category="all" data-i18n="filter_all">ทั้งหมด</button>
+                    <button class="tab-btn" data-category="bathroom" data-i18n="cat_bathroom">ห้องน้ำ</button>
+                    <button class="tab-btn" data-category="kitchen" data-i18n="cat_kitchen">ห้องครัว</button>
+                    <button class="tab-btn" data-category="living" data-i18n="cat_living">ห้องนั่งเล่น</button>
+                    <button class="tab-btn" data-category="bedroom" data-i18n="cat_bedroom">ห้องนอน</button>
+                    <button class="tab-btn" data-category="other" data-i18n="cat_other">อื่นๆ</button>
                 </div>
 
                 <div class="furniture-grid" id="furniture-grid">
@@ -181,9 +188,9 @@
         <div class="card" style="max-width: 400px; text-align: center;">
             <ion-icon name="checkmark-circle" size="large"
                 style="color: #10b981; font-size: 4rem; margin-bottom: 1rem;"></ion-icon>
-            <h2>ส่งข้อมูลสำเร็จ</h2>
-            <p style="color: var(--text-muted); margin: 1rem 0;">เราได้รับแจ้งความประสงค์ของคุณแล้ว</p>
-            <button class="btn btn-primary" onclick="closeModal()">ตกลง</button>
+            <h2 data-i18n="modal_success_title">ส่งข้อมูลสำเร็จ</h2>
+            <p style="color: var(--text-muted); margin: 1rem 0;" data-i18n="modal_success_desc">เราได้รับแจ้งความประสงค์ของคุณแล้ว</p>
+            <button class="btn btn-primary" onclick="closeModal()" data-i18n="btn_ok">ตกลง</button>
         </div>
     </div>
 
@@ -192,7 +199,7 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div class="card" style="max-width: 450px; width: 90%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem;">ประเมินความพึงพอใจ</h2>
+                <h2 style="font-size: 1.5rem;" data-i18n="review_modal_title">ประเมินความพึงพอใจ</h2>
                 <ion-icon name="close-outline" style="font-size: 1.5rem; cursor: pointer;"
                     onclick="closeReviewModal()"></ion-icon>
             </div>
@@ -205,20 +212,20 @@
                         <ion-icon name="person"></ion-icon>
                     </div>
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">ช่างผู้รับผิดชอบ</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="review_tech_label">ช่างผู้รับผิดชอบ</div>
                         <div id="reviewTechName" style="font-weight: 600;">ช่างวิชัย</div>
                     </div>
                 </div>
                 <div
                     style="font-size: 0.9rem; color: var(--text-main); margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
-                    <strong>รายงานการซ่อม:</strong>
+                    <strong data-i18n="review_report_label">รายงานการซ่อม:</strong>
                     <p id="reviewTechReport" style="margin-top: 0.3rem; opacity: 0.8;">
                         ดำเนินการเปลี่ยนอุปกรณ์เรียบร้อยแล้ว ทดสอบการใช้งานปกติ</p>
                 </div>
             </div>
 
             <div style="text-align: center; margin-bottom: 1.5rem;">
-                <p style="margin-bottom: 1rem; font-weight: 600;">คะแนนความพึงพอใจ</p>
+                <p style="margin-bottom: 1rem; font-weight: 600;" data-i18n="review_score_label">คะแนนความพึงพอใจ</p>
                 <div class="star-input" style="font-size: 2.5rem; display: flex; justify-content: center; gap: 0.5rem;">
                     <ion-icon name="star-outline" onclick="updateStarUI(1)" style="cursor: pointer;"></ion-icon>
                     <ion-icon name="star-outline" onclick="updateStarUI(2)" style="cursor: pointer;"></ion-icon>
@@ -229,17 +236,18 @@
             </div>
 
             <div class="form-group">
-                <label>ความคิดเห็นเพิ่มเติม (ถ้ามี)</label>
-                <textarea id="reviewFeedback" rows="3" placeholder="ช่างทำงานดีมากครับ, สุภาพเรียบร้อย..."></textarea>
+                <label data-i18n="review_feedback_label">ความคิดเห็นเพิ่มเติม (ถ้ามี)</label>
+                <textarea id="reviewFeedback" rows="3" placeholder="ช่างทำงานดีมากครับ, สุภาพเรียบร้อย..." data-i18n-placeholder="review_feedback_placeholder"></textarea>
             </div>
 
             <button id="btn-submit-review" class="btn btn-primary" style="width: 100%; margin-top: 1rem;"
-                onclick="submitReview()" disabled>
+                onclick="submitReview()" disabled data-i18n="btn_submit_review">
                 ส่งผลการประเมิน
             </button>
         </div>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

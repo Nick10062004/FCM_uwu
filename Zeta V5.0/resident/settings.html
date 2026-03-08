@@ -32,23 +32,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="grid-outline"></ion-icon>
-                            <span>หน้าหลัก</span>
+                            <span data-i18n="nav_home">หน้าหลัก</span>
                         </a></li>
                     <li><a href="repair.html" class="nav-item">
                             <ion-icon name="hammer-outline"></ion-icon>
-                            <span>แจ้งซ่อม</span>
+                            <span data-i18n="nav_repair">แจ้งซ่อม</span>
                         </a></li>
                     <li><a href="history.html" class="nav-item">
                             <ion-icon name="list-outline"></ion-icon>
-                            <span>ประวัติการซ่อม</span>
+                            <span data-i18n="nav_history">ประวัติการซ่อม</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item active">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -56,45 +56,52 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>ตั้งค่า</h1>
-                <p class="header-meta">ปรับแต่งประสบการณ์การใช้งานตามความต้องการของคุณ</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="settings_title">ตั้งค่า</h1>
+                    <p class="header-meta" data-i18n="settings_meta">ปรับแต่งประสบการณ์การใช้งานตามความต้องการของคุณ</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div style="max-width: 800px; margin: 0 auto;">
                 <!-- Theme Section -->
                 <section class="card settings-section animate-fade-in">
-                    <h3>ธีมหน้าจอ</h3>
+                    <h3 data-i18n="theme_title">ธีมหน้าจอ</h3>
                     <div class="theme-selector">
                         <div class="theme-option" data-theme="light" onclick="setTheme('light', true)">
                             <div class="theme-preview" style="background: #f8fafc; border: 1px solid #e2e8f0;"></div>
-                            <span>สว่าง (Light)</span>
+                            <span data-i18n="theme_light">สว่าง (Light)</span>
                         </div>
                         <div class="theme-option" data-theme="dark" onclick="setTheme('dark', true)">
                             <div class="theme-preview" style="background: #0f172a; border: 1px solid #334155;"></div>
-                            <span>มืด (Dark)</span>
+                            <span data-i18n="theme_dark">มืด (Dark)</span>
                         </div>
                         <div class="theme-option" data-theme="auto" onclick="setTheme('auto', true)">
                             <div class="theme-preview"
                                 style="background: linear-gradient(135deg, #f8fafc 50%, #0f172a 50%);"></div>
-                            <span>อัตโนมัติ (Auto)</span>
+                            <span data-i18n="theme_auto">อัตโนมัติ (Auto)</span>
                         </div>
                     </div>
                 </section>
 
                 <!-- Notifications Section -->
                 <section class="card settings-section animate-fade-in" style="animation-delay: 0.1s;">
-                    <h3>การแจ้งเตือน</h3>
+                    <h3 data-i18n="notif_title">การแจ้งเตือน</h3>
                     <div class="settings-group">
                         <div class="setting-row">
-                            <span>ข่าวสารและประกาศหมู่บ้าน</span>
+                            <span data-i18n="notif_news">ข่าวสารและประกาศหมู่บ้าน</span>
                             <label class="switch">
                                 <input type="checkbox" id="notif-news" checked
                                     onchange="updateSetting('notif-news', this.checked)">
@@ -102,7 +109,7 @@
                             </label>
                         </div>
                         <div class="setting-row">
-                            <span>สถานะคำขอแจ้งซ่อม</span>
+                            <span data-i18n="notif_repair">สถานะคำขอแจ้งซ่อม</span>
                             <label class="switch">
                                 <input type="checkbox" id="notif-repair" checked
                                     onchange="updateSetting('notif-repair', this.checked)">
@@ -114,36 +121,36 @@
 
                 <!-- 3D Graphics Section -->
                 <section class="card settings-section animate-fade-in" style="animation-delay: 0.2s;">
-                    <h3>คุณภาพกราฟิก (3D Model)</h3>
+                    <h3 data-i18n="gfx_title">คุณภาพกราฟิก (3D Model)</h3>
                     <div class="settings-group">
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">ปรับแต่งความสวยงามของโมเดลบ้าน 3 มิติ
+                        <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="gfx_desc">ปรับแต่งความสวยงามของโมเดลบ้าน 3 มิติ
                         </p>
 
                         <div class="setting-row">
-                            <span>ระดับการประมวลผล (Overall Quality)</span>
+                            <span data-i18n="gfx_overall">ระดับการประมวลผล (Overall Quality)</span>
                             <select id="gfx-overall" class="input-light" style="width: 120px;"
                                 onchange="updateOverallQuality(this.value)">
-                                <option value="low">ต่ำ</option>
-                                <option value="med">กลาง</option>
-                                <option value="high" selected>สูง</option>
+                                <option value="low" data-i18n="gfx_low">ต่ำ</option>
+                                <option value="med" data-i18n="gfx_med">กลาง</option>
+                                <option value="high" selected data-i18n="gfx_high">สูง</option>
                             </select>
                         </div>
                         <div class="setting-row">
-                            <span>คุณภาพพื้นผิว (Texture Quality)</span>
+                            <span data-i18n="gfx_texture">คุณภาพพื้นผิว (Texture Quality)</span>
                             <select id="gfx-texture" class="input-light" style="width: 120px;"
                                 onchange="updateSetting('gfx-texture', this.value)">
-                                <option value="low">ต่ำ</option>
-                                <option value="med">กลาง</option>
-                                <option value="high" selected>สูง</option>
+                                <option value="low" data-i18n="gfx_low">ต่ำ</option>
+                                <option value="med" data-i18n="gfx_med">กลาง</option>
+                                <option value="high" selected data-i18n="gfx_high">สูง</option>
                             </select>
                         </div>
                         <div class="setting-row">
-                            <span>คุณภาพเงา (Shadow Quality)</span>
+                            <span data-i18n="gfx_shadows">คุณภาพเงา (Shadow Quality)</span>
                             <select id="gfx-shadows" class="input-light" style="width: 120px;"
                                 onchange="updateSetting('gfx-shadows', this.value)">
-                                <option value="low">ต่ำ</option>
-                                <option value="med">กลาง</option>
-                                <option value="high" selected>สูง</option>
+                                <option value="low" data-i18n="gfx_low">ต่ำ</option>
+                                <option value="med" data-i18n="gfx_med">กลาง</option>
+                                <option value="high" selected data-i18n="gfx_high">สูง</option>
                             </select>
                         </div>
                     </div>
@@ -152,16 +159,17 @@
                 <!-- Action Buttons (v1.6) -->
                 <div class="settings-actions">
                     <button id="btn-undo" class="btn btn-secondary" onclick="revertSettings()">
-                        ย้อนกลับ
+                        <span data-i18n="btn_undo">ย้อนกลับ</span>
                     </button>
                     <button id="btn-save-settings" class="btn btn-primary" onclick="saveAllSettings()">
-                        บันทึกการตั้งค่า
+                        <span data-i18n="btn_save_settings">บันทึกการตั้งค่า</span>
                     </button>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

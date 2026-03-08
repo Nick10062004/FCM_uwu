@@ -31,19 +31,19 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>รายการงาน</span>
+                            <span data-i18n="tech_nav_tasks">รายการงาน</span>
                         </a></li>
                     <li><a href="calendar.html" class="nav-item">
                             <ion-icon name="calendar-outline"></ion-icon>
-                            <span>ตารางงาน</span>
+                            <span data-i18n="tech_nav_calendar">ตารางงาน</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="tech_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item active">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="tech_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -51,51 +51,58 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout_tech">ออกจากระบบ (ช่าง)</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>ตั้งค่า</h1>
-                <p class="header-meta">จัดการการแจ้งเตือนและความปลอดภัย</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="tech_settings_title">ตั้งค่า</h1>
+                    <p class="header-meta" data-i18n="tech_settings_meta">จัดการการแจ้งเตือนและความปลอดภัย</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div style="max-width: 800px; margin: 0 auto;">
                 <!-- Theme Section -->
                 <section class="card settings-section animate-fade-in">
-                    <h3>ธีมหน้าจอ</h3>
+                    <h3 data-i18n="theme_title">ธีมหน้าจอ</h3>
                     <div class="theme-selector">
                         <div class="theme-option" data-theme="light" onclick="setTheme('light', true)">
                             <div class="theme-preview" style="background: #f8fafc; border: 1px solid #e2e8f0;"></div>
-                            <span>สว่าง (Light)</span>
+                            <span data-i18n="theme_light">สว่าง (Light)</span>
                         </div>
                         <div class="theme-option" data-theme="dark" onclick="setTheme('dark', true)">
                             <div class="theme-preview" style="background: #0f172a; border: 1px solid #334155;"></div>
-                            <span>มืด (Dark)</span>
+                            <span data-i18n="theme_dark">มืด (Dark)</span>
                         </div>
                         <div class="theme-option" data-theme="auto" onclick="setTheme('auto', true)">
                             <div class="theme-preview"
                                 style="background: linear-gradient(135deg, #f8fafc 50%, #0f172a 50%);"></div>
-                            <span>อัตโนมัติ (Auto)</span>
+                            <span data-i18n="theme_auto">อัตโนมัติ (Auto)</span>
                         </div>
                     </div>
                 </section>
 
                 <section class="card settings-section animate-fade-in" style="animation-delay: 0.1s;">
-                    <h3>การแจ้งเตือนงาน</h3>
+                    <h3 data-i18n="notif_tech_title">การแจ้งเตือนงาน</h3>
                     <div class="settings-group">
                         <div class="setting-row">
-                            <span>แจ้งเตือนงานเช้าวันใหม</span>
+                            <span data-i18n="notif_tech_morning">แจ้งเตือนงานเช้าวันใหม</span>
                             <label class="switch">
                                 <input type="checkbox" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
                         <div class="setting-row">
-                            <span>แจ้งเตือนคำขอด่วน</span>
+                            <span data-i18n="notif_tech_urgent">แจ้งเตือนคำขอด่วน</span>
                             <label class="switch">
                                 <input type="checkbox" checked>
                                 <span class="slider"></span>
@@ -105,13 +112,18 @@
                 </section>
 
                 <div class="settings-actions">
-                    <button class="btn btn-secondary" onclick="alert('ยกเลิกการเปลี่ยนแปลง')">ย้อนกลับ</button>
-                    <button class="btn btn-primary" onclick="alert('บันทึกการตั้งค่าสำเร็จ')">บันทึกการตั้งค่า</button>
+                    <button class="btn btn-secondary" onclick="alert('ยกเลิกการเปลี่ยนแปลง')">
+                        <span data-i18n="btn_cancel_changes">ย้อนกลับ</span>
+                    </button>
+                    <button class="btn btn-primary" onclick="alert('บันทึกการตั้งค่าสำเร็จ')">
+                        <span data-i18n="btn_save_settings">บันทึกการตั้งค่า</span>
+                    </button>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

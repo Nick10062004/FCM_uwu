@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import '../../../../core/data/auth_repository.dart';
 
 // --- Theme Data ---
 class LoginTheme {
@@ -264,33 +265,59 @@ class _LoginScreenState extends State<LoginScreen>
     if (formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      if (_isLoginMode) {
-        // Role-based routing
-        await Future.delayed(const Duration(milliseconds: 500));
-        setState(() => _isLoading = false);
-        if (mounted) {
-          final email = _emailController.text.trim().toLowerCase();
-          String route = '/3d_model'; // Default for residents
+      try {
+        if (_isLoginMode) {
+          final result = await AuthRepository.instance.login(
+            _emailController.text.trim(),
+            _passwordController.text,
+          );
 
-          if (email == 'admin@gmail.com') {
-            route = '/juristic';
-          } else if (email == 'technician@gmail.com') {
-            route = '/technician';
+          setState(() => _isLoading = false);
+
+          if (result['success']) {
+            if (mounted) {
+              final user = result['data']['user'] ?? {};
+              final role = (user['role'] as String?)?.toLowerCase() ?? 'resident';
+              
+              String route = '/3d_model';
+              if (role == 'admin' || role == 'juristic') {
+                route = '/juristic';
+              } else if (role == 'technician') {
+                route = '/technician';
+              }
+
+              Navigator.pushReplacementNamed(context, route, arguments: user['name'] ?? user['email']);
+            }
+          } else {
+            _showError(result['error'] ?? 'Login failed');
           }
+        } else {
+          // Register Mode
+          final result = await AuthRepository.instance.register(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            name: _nameController.text.trim(),
+            phone: _phoneController.text.trim(),
+            houseId: _houseIdController.text.trim(),
+          );
 
-          Navigator.pushReplacementNamed(context, route, arguments: email);
+          setState(() => _isLoading = false);
+
+          if (result['success']) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Account created! Please Sign In.',
+                      style: GoogleFonts.kanit()),
+                  backgroundColor: Colors.green));
+              setState(() => _isLoginMode = true);
+            }
+          } else {
+            _showError(result['error'] ?? 'Registration failed');
+          }
         }
-      } else {
-        // Quick Success for Sign Up
-        await Future.delayed(const Duration(milliseconds: 500));
+      } catch (e) {
         setState(() => _isLoading = false);
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Account created successfully!',
-                  style: GoogleFonts.kanit()),
-              backgroundColor: Colors.green));
-          setState(() => _isLoginMode = true);
-        }
+        _showError('Connection Error: $e');
       }
     }
   }

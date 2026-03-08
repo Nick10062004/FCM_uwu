@@ -32,23 +32,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="grid-outline"></ion-icon>
-                            <span>หน้าหลัก</span>
+                            <span data-i18n="nav_home">หน้าหลัก</span>
                         </a></li>
                     <li><a href="repair.html" class="nav-item">
                             <ion-icon name="hammer-outline"></ion-icon>
-                            <span>แจ้งซ่อม</span>
+                            <span data-i18n="nav_repair">แจ้งซ่อม</span>
                         </a></li>
                     <li><a href="history.html" class="nav-item active">
                             <ion-icon name="list-outline"></ion-icon>
-                            <span>ประวัติการซ่อม</span>
+                            <span data-i18n="nav_history">ประวัติการซ่อม</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -56,29 +56,36 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>ประวัติการซ่อม</h1>
-                <p class="header-meta">ตรวจสอบรายการแจ้งซ่อมที่ผ่านมาทั้งหมด</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="history_title">ประวัติการซ่อม</h1>
+                    <p class="header-meta" data-i18n="history_meta">ตรวจสอบรายการแจ้งซ่อมที่ผ่านมาทั้งหมด</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <!-- Repair History Section -->
             <section class="card animate-fade-in">
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-                    <h3>รายการประวัติหมู่บ้าน</h3>
+                    <h3 data-i18n="history_list">รายการประวัติหมู่บ้าน</h3>
                     <div style="display: flex; gap: 0.5rem; align-items: center;">
                         <input type="date" id="history-start" style="width: auto; padding: 0.5rem;" class="input-light">
-                        <span>ถึง</span>
+                        <span data-i18n="history_to">ถึง</span>
                         <input type="date" id="history-end" style="width: auto; padding: 0.5rem;" class="input-light">
                         <button class="btn btn-primary" style="padding: 0.5rem 1rem;" id="btn-filter-history">
-                            <ion-icon name="search-outline"></ion-icon> ค้นหา
+                            <ion-icon name="search-outline"></ion-icon> <span data-i18n="btn_search">ค้นหา</span>
                         </button>
                     </div>
                 </div>
@@ -86,23 +93,23 @@
                 <!-- Status Filter (v2.2) -->
                 <div class="category-tabs" style="margin-bottom: 2rem; justify-content: flex-start;">
                     <button class="tab-btn status-filter-btn active"
-                        onclick="filterRequests('all', this)">ทั้งหมด</button>
+                        onclick="filterRequests('all', this)" data-i18n="filter_all">ทั้งหมด</button>
                     <button class="tab-btn status-filter-btn"
-                        onclick="filterRequests('pending', this)">รออนุมัติ</button>
+                        onclick="filterRequests('pending', this)" data-i18n="filter_pending">รออนุมัติ</button>
                     <button class="tab-btn status-filter-btn"
-                        onclick="filterRequests('working', this)">กำลังดำเนินการ</button>
-                    <button class="tab-btn status-filter-btn" onclick="filterRequests('done', this)">เสร็จสิ้น</button>
+                        onclick="filterRequests('working', this)" data-i18n="filter_working">กำลังดำเนินการ</button>
+                    <button class="tab-btn status-filter-btn" onclick="filterRequests('done', this)" data-i18n="filter_done">เสร็จสิ้น</button>
                 </div>
 
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>วันที่แจ้ง</th>
-                                <th>หมวดหมู่</th>
-                                <th>หัวข้อ</th>
-                                <th>สถานะ</th>
-                                <th>การรีวิว</th>
+                                <th data-i18n="col_date">วันที่แจ้ง</th>
+                                <th data-i18n="col_category">หมวดหมู่</th>
+                                <th data-i18n="col_topic">หัวข้อ</th>
+                                <th data-i18n="col_status">สถานะ</th>
+                                <th data-i18n="col_review">การรีวิว</th>
                             </tr>
                         </thead>
                         <tbody id="historyTableBody">
@@ -118,7 +125,7 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div class="card" style="max-width: 450px; width: 90%;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h2 style="font-size: 1.5rem;">ประเมินความพึงพอใจ</h2>
+                <h2 style="font-size: 1.5rem;" data-i18n="review_modal_title">ประเมินความพึงพอใจ</h2>
                 <ion-icon name="close-outline" style="font-size: 1.5rem; cursor: pointer;"
                     onclick="closeReviewModal()"></ion-icon>
             </div>
@@ -131,20 +138,20 @@
                         <ion-icon name="person"></ion-icon>
                     </div>
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">ช่างผู้รับผิดชอบ</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);" data-i18n="review_tech_label">ช่างผู้รับผิดชอบ</div>
                         <div id="reviewTechName" style="font-weight: 600;">ช่างวิชัย</div>
                     </div>
                 </div>
                 <div
                     style="font-size: 0.9rem; color: var(--text-main); margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed var(--border);">
-                    <strong>รายงานการซ่อม:</strong>
+                    <strong data-i18n="review_report_label">รายงานการซ่อม:</strong>
                     <p id="reviewTechReport" style="margin-top: 0.3rem; opacity: 0.8;">
                         ดำเนินการเปลี่ยนอุปกรณ์เรียบร้อยแล้ว ทดสอบการใช้งานปกติ</p>
                 </div>
             </div>
 
             <div style="text-align: center; margin-bottom: 1.5rem;">
-                <p style="margin-bottom: 1rem; font-weight: 600;">คะแนนความพึงพอใจ</p>
+                <p style="margin-bottom: 1rem; font-weight: 600;" data-i18n="review_score_label">คะแนนความพึงพอใจ</p>
                 <div class="star-input" style="font-size: 2.5rem; display: flex; justify-content: center; gap: 0.5rem;">
                     <ion-icon name="star-outline" onclick="updateStarUI(1)" style="cursor: pointer;"></ion-icon>
                     <ion-icon name="star-outline" onclick="updateStarUI(2)" style="cursor: pointer;"></ion-icon>
@@ -155,17 +162,18 @@
             </div>
 
             <div class="form-group">
-                <label>ความคิดเห็นเพิ่มเติม (ถ้ามี)</label>
-                <textarea id="reviewFeedback" rows="3" placeholder="ช่างทำงานดีมากครับ, สุภาพเรียบร้อย..."></textarea>
+                <label data-i18n="review_feedback_label">ความคิดเห็นเพิ่มเติม (ถ้ามี)</label>
+                <textarea id="reviewFeedback" rows="3" placeholder="ช่างทำงานดีมากครับ, สุภาพเรียบร้อย..." data-i18n-placeholder="review_feedback_placeholder"></textarea>
             </div>
 
             <button id="btn-submit-review" class="btn btn-primary" style="width: 100%; margin-top: 1rem;"
-                onclick="submitReview()" disabled>
+                onclick="submitReview()" disabled data-i18n="btn_submit_review">
                 ส่งผลการประเมิน
             </button>
         </div>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 

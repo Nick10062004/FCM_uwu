@@ -127,19 +127,19 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>รายการงาน</span>
+                            <span data-i18n="tech_nav_tasks">รายการงาน</span>
                         </a></li>
                     <li><a href="calendar.html" class="nav-item">
                             <ion-icon name="calendar-outline"></ion-icon>
-                            <span>ตารางงาน</span>
+                            <span data-i18n="tech_nav_calendar">ตารางงาน</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="tech_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="tech_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -147,22 +147,28 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout_tech">ออกจากระบบ (ช่าง)</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center;">
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
+                    <h1 data-i18n="tech_task_title" id="taskTitleTitle" style="display:none;">รายละเอียดงาน</h1>
                     <a href="index.html"
                         style="text-decoration: none; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.5rem;">
-                        <ion-icon name="arrow-back-outline"></ion-icon> กลับหน้าหลัก
+                        <ion-icon name="arrow-back-outline"></ion-icon> <span data-i18n="back_to_main">กลับหน้าหลัก</span>
                     </a>
-                    <h1 id="taskTitle">กำลังโหลดข้อมูล...</h1>
+                    <h1 id="taskTitle" data-i18n="loading_data">กำลังโหลดข้อมูล...</h1>
                 </div>
-                <div id="taskStatusBadge"></div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
+                <div id="taskStatusBadge" style="margin-left: 1rem;"></div>
             </header>
 
             <div class="detail-grid animate-fade-in">
@@ -171,11 +177,11 @@
                     <div class="card">
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3 style="display: flex; align-items: center; gap: 0.5rem;">
+                            <h3 style="display: flex; align-items: center; gap: 0.5rem;" data-i18n="3d_view_title">
                                 <ion-icon name="business-outline" style="color: var(--gold);"></ion-icon>
                                 พื้นที่ซ่อมแซม (3D View)
                             </h3>
-                            <span id="houseNumber" style="font-weight: 700; color: var(--text-muted);">บ้านเลขที่
+                            <span id="houseNumber" style="font-weight: 700; color: var(--text-muted);"><span data-i18n="house_number_default">บ้านเลขที่</span>
                                 --</span>
                         </div>
 
@@ -184,30 +190,30 @@
                             <div style="text-align: center;">
                                 <ion-icon name="cube-outline"
                                     style="font-size: 5rem; color: var(--gold); opacity: 0.3;"></ion-icon>
-                                <p style="color: var(--text-muted); margin-top: 1rem;">[ 3D Model Loading... ]</p>
+                                <p style="color: var(--text-muted); margin-top: 1rem;" data-i18n="3d_loading">[ 3D Model Loading... ]</p>
                             </div>
 
                             <div
                                 style="position: absolute; top: 1rem; right: 1rem; background: var(--bg-card); padding: 0.5rem; border-radius: 8px; font-size: 0.75rem; border: 1px solid var(--border);">
                                 <ion-icon name="location" style="color: #ef4444; vertical-align: middle;"></ion-icon>
-                                จุดแจ้งซ่อม: <span id="targetObject" style="font-weight: 700;">--</span>
+                                <span data-i18n="repair_point">จุดแจ้งซ่อม:</span> <span id="targetObject" style="font-weight: 700;">--</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="card">
-                        <h3>รายละเอียดความเสียหาย</h3>
+                        <h3 data-i18n="damage_details_title">รายละเอียดความเสียหาย</h3>
                         <p id="taskDetails" style="margin-top: 1rem; color: var(--text-main);">--</p>
 
                         <div style="margin-top: 2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                             <div class="warranty-info">
-                                <p style="font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">ผู้แจ้งซ่อม</p>
+                                <p style="font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;" data-i18n="requester_info_title">ผู้แจ้งซ่อม</p>
                                 <p id="requesterName">--</p>
                                 <p id="requesterPhone"
                                     style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.2rem;">--</p>
                             </div>
                             <div class="warranty-info">
-                                <p style="font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;">วันเวลาที่นัดหมาย
+                                <p style="font-weight: 600; font-size: 0.8rem; margin-bottom: 0.5rem;" data-i18n="appt_time_title">วันเวลาที่นัดหมาย
                                 </p>
                                 <p id="preferredDateDisplay">--</p>
                             </div>
@@ -218,27 +224,27 @@
                 <!-- Right: Action & Stepper -->
                 <div style="display: flex; flex-direction: column; gap: 2rem;">
                     <div class="card">
-                        <h3>สถานะงาน</h3>
+                        <h3 data-i18n="task_status_title">สถานะงาน</h3>
                         <div class="status-stepper">
                             <div id="step-pending" class="step">
                                 <div class="step-icon"><ion-icon name="checkmark"></ion-icon></div>
                                 <div class="step-content">
-                                    <h4>มอบหมายงาน</h4>
+                                    <h4 data-i18n="step_assigned">มอบหมายงาน</h4>
                                     <p id="assignedTime">--</p>
                                 </div>
                             </div>
                             <div id="step-working" class="step">
                                 <div class="step-icon">2</div>
                                 <div class="step-content">
-                                    <h4>กำลังดำเนินการ</h4>
-                                    <p>ช่างกำลังเดินทาง/เข้าซ่อม</p>
+                                    <h4 data-i18n="step_working">กำลังดำเนินการ</h4>
+                                    <p data-i18n="step_working_desc">ช่างกำลังเดินทาง/เข้าซ่อม</p>
                                 </div>
                             </div>
                             <div id="step-done" class="step">
                                 <div class="step-icon">3</div>
                                 <div class="step-content">
-                                    <h4>เสร็จสิ้น</h4>
-                                    <p>รอการประเมินจากลูกบ้าน</p>
+                                    <h4 data-i18n="step_done">เสร็จสิ้น</h4>
+                                    <p data-i18n="step_done_desc">รอการประเมินจากลูกบ้าน</p>
                                 </div>
                             </div>
                         </div>
@@ -246,23 +252,24 @@
                         <div style="margin-top: 2.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem;">
                             <button id="btnAction" class="btn btn-primary" style="width: 100%;"
                                 onclick="toggleTaskStatus()">
-                                เริ่มดำเนินการ
+                                <span data-i18n="btn_start_work">เริ่มดำเนินการ</span>
                             </button>
                         </div>
                     </div>
 
                     <div class="card" style="background: var(--bg-main);">
-                        <h4 style="margin-bottom: 1rem;">บันทึกรายงาน</h4>
+                        <h4 style="margin-bottom: 1rem;" data-i18n="report_title">บันทึกรายงาน</h4>
                         <textarea id="techReport" placeholder="ระบุรายละเอียดการซ่อม..."
-                            style="height: 120px; background: var(--bg-card); font-size: 0.85rem;"></textarea>
+                            style="height: 120px; background: var(--bg-card); font-size: 0.85rem;" data-i18n-placeholder="report_placeholder"></textarea>
                         <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem; font-size: 0.85rem;"
-                            onclick="alert('บันทึกรายงานเรียบร้อย')">บันทึกโน้ต</button>
+                            onclick="alert('บันทึกรายงานเรียบร้อย')"><span data-i18n="btn_save_note">บันทึกโน้ต</span></button>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

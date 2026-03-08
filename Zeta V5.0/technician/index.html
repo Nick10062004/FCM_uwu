@@ -32,19 +32,19 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item active">
                             <ion-icon name="clipboard-outline"></ion-icon>
-                            <span>รายการงาน</span>
+                            <span data-i18n="tech_nav_tasks">รายการงาน</span>
                         </a></li>
                     <li><a href="calendar.html" class="nav-item">
                             <ion-icon name="calendar-outline"></ion-icon>
-                            <span>ตารางงาน</span>
+                            <span data-i18n="tech_nav_calendar">ตารางงาน</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="tech_nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="tech_nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -52,24 +52,31 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>งานที่ได้รับมอบหมาย</h1>
-                <p class="header-meta">สวัสดี ช่างวิชัย | วันนี้คุณมี 3 งานที่ต้องดำเนินการ</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="tech_index_title">งานที่ได้รับมอบหมาย</h1>
+                    <p class="header-meta" data-i18n="tech_index_meta">สวัสดี ช่างวิชัย | วันนี้คุณมี 3 งานที่ต้องดำเนินการ</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <!-- Filters -->
             <div class="category-tabs" style="margin-bottom: 2rem;">
-                <button class="tab-btn active" data-filter="all">ทั้งหมด</button>
-                <button class="tab-btn" data-filter="working">กำลังทำ</button>
-                <button class="tab-btn" data-filter="pending">รอดำเนินการ</button>
-                <button class="tab-btn" data-filter="done">สำเร็จแล้ว</button>
+                <button class="tab-btn active" data-filter="all" data-i18n="filter_tech_all">ทั้งหมด</button>
+                <button class="tab-btn" data-filter="working" data-i18n="filter_tech_working">กำลังทำ</button>
+                <button class="tab-btn" data-filter="pending" data-i18n="filter_tech_pending">รอดำเนินการ</button>
+                <button class="tab-btn" data-filter="done" data-i18n="filter_tech_done">สำเร็จแล้ว</button>
             </div>
 
             <!-- Task Grid -->
@@ -77,12 +84,13 @@
                 <!-- Task items will be rendered here by app.js -->
                 <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-muted);">
                     <div class="loader"></div>
-                    <p style="margin-top: 1rem;">กำลังโหลดรายการงานของคุณ...</p>
+                    <p style="margin-top: 1rem;" data-i18n="tech_loading">กำลังโหลดรายการงานของคุณ...</p>
                 </div>
             </div>
         </main>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

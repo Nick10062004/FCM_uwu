@@ -32,23 +32,23 @@
                 <ul class="nav-links">
                     <li><a href="index.html" class="nav-item">
                             <ion-icon name="grid-outline"></ion-icon>
-                            <span>หน้าหลัก</span>
+                            <span data-i18n="nav_home">หน้าหลัก</span>
                         </a></li>
                     <li><a href="repair.html" class="nav-item">
                             <ion-icon name="hammer-outline"></ion-icon>
-                            <span>แจ้งซ่อม</span>
+                            <span data-i18n="nav_repair">แจ้งซ่อม</span>
                         </a></li>
                     <li><a href="history.html" class="nav-item">
                             <ion-icon name="list-outline"></ion-icon>
-                            <span>ประวัติการซ่อม</span>
+                            <span data-i18n="nav_history">ประวัติการซ่อม</span>
                         </a></li>
                     <li><a href="profile.html" class="nav-item active">
                             <ion-icon name="person-outline"></ion-icon>
-                            <span>โปรไฟล์</span>
+                            <span data-i18n="nav_profile">โปรไฟล์</span>
                         </a></li>
                     <li><a href="settings.html" class="nav-item">
                             <ion-icon name="settings-outline"></ion-icon>
-                            <span>ตั้งค่า</span>
+                            <span data-i18n="nav_settings">ตั้งค่า</span>
                         </a></li>
                 </ul>
             </nav>
@@ -56,70 +56,76 @@
             <div class="logout-box">
                 <button class="btn btn-logout" onclick="confirmLogout()">
                     <ion-icon name="log-out-outline"></ion-icon>
-                    ออกจากระบบ
+                    <span data-i18n="btn_logout">ออกจากระบบ</span>
                 </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <header>
-                <h1>โปรไฟล์ส่วนตัว</h1>
-                <p class="header-meta">จัดการข้อมูลและบัญชีผู้ใช้ของคุณ</p>
+            <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 data-i18n="profile_title">โปรไฟล์ส่วนตัว</h1>
+                    <p class="header-meta" data-i18n="profile_meta">จัดการข้อมูลและบัญชีผู้ใช้ของคุณ</p>
+                </div>
+                <div style="display: flex; gap: 10px; font-size: 0.9rem; margin-top: 10px;">
+                    <span class="lang-btn" data-lang="th" style="cursor: pointer;" onclick="changeLanguage('th')">TH</span>
+                    <span class="lang-btn" data-lang="en" style="cursor: pointer;" onclick="changeLanguage('en')">EN</span>
+                    <span class="lang-btn" data-lang="zh" style="cursor: pointer;" onclick="changeLanguage('zh')">ZH</span>
+                </div>
             </header>
 
             <div style="max-width: 800px; margin: 0 auto;">
                 <section class="card profile-card animate-fade-in">
                     <div class="profile-avatar">S</div>
-                    <h2 style="margin-bottom: 0.5rem;">สมชาย รักดี</h2>
-                    <p style="color: var(--text-muted); margin-bottom: 2rem;">สมาชิกโครงการ Zeta Estate (โซน A)</p>
+                    <h2 style="margin-bottom: 0.5rem;" data-i18n="profile_name">สมชาย รักดี</h2>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;" data-i18n="profile_desc">สมาชิกโครงการ Zeta Estate (โซน A)</p>
 
                     <div class="profile-info-grid" style="width: 100%; text-align: left;">
                         <div class="info-item">
-                            <span class="info-label">ชื่อ-นามสกุล</span>
-                            <span class="info-value">สมชาย รักดี</span>
+                            <span class="info-label" data-i18n="info_name">ชื่อ-นามสกุล</span>
+                            <span class="info-value" data-i18n="profile_name">สมชาย รักดี</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">เลขประจำตัวประชาชน</span>
+                            <span class="info-label" data-i18n="info_id">เลขประจำตัวประชาชน</span>
                             <span class="info-value">1-2345-67890-12-3</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">เบอร์โทรศัพท์</span>
+                            <span class="info-label" data-i18n="info_phone">เบอร์โทรศัพท์</span>
                             <div>
                                 <span class="info-value">081-234-5678</span>
-                                <span class="edit-link"
+                                <span class="edit-link" data-i18n="btn_edit"
                                     onclick="openEditModal('phone', 'เบอร์โทรศัพท์', '081-234-5678')">แก้ไข</span>
                             </div>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">อีเมล</span>
+                            <span class="info-label" data-i18n="info_email">อีเมล</span>
                             <div>
                                 <span class="info-value">somchai.r@email.com</span>
-                                <span class="edit-link"
+                                <span class="edit-link" data-i18n="btn_edit"
                                     onclick="openEditModal('email', 'อีเมล', 'somchai.r@email.com')">แก้ไข</span>
                             </div>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">รหัสผ่าน</span>
+                            <span class="info-label" data-i18n="info_password">รหัสผ่าน</span>
                             <div>
                                 <span class="info-value">********</span>
-                                <span class="edit-link"
+                                <span class="edit-link" data-i18n="btn_change_pass"
                                     onclick="openEditModal('password', 'รหัสผ่าน', '********')">เปลี่ยนรหัส</span>
                             </div>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">PIN (6 หลัก)</span>
+                            <span class="info-label" data-i18n="info_pin">PIN (6 หลัก)</span>
                             <div>
                                 <span class="info-value">******</span>
-                                <span class="edit-link" onclick="openEditModal('pin', 'PIN (6 หลัก)', '******')">เปลี่ยน
-                                    PIN</span>
+                                <span class="edit-link" data-i18n="btn_change_pin" onclick="openEditModal('pin', 'PIN (6 หลัก)', '******')">เปลี่ยน PIN</span>
                             </div>
                         </div>
                     </div>
 
                     <button class="btn btn-logout" onclick="confirmLogout()">
                         <ion-icon name="log-out-outline" style="margin-right: 0.5rem;"></ion-icon>
-                        ออกจากระบบ
+                        <span data-i18n="btn_logout">ออกจากระบบ</span>
                     </button>
                 </section>
             </div>
@@ -131,19 +137,19 @@
         style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="editModalTitle">แก้ไขข้อมูล</h3>
+                <h3 id="editModalTitle" data-i18n="modal_edit_title">แก้ไขข้อมูล</h3>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editTypeHidden">
                 <div class="form-group">
-                    <label id="editInputLabel">ข้อมูล</label>
+                    <label id="editInputLabel" data-i18n="modal_edit_label">ข้อมูล</label>
                     <input type="text" id="editInputValue" class="input-light" style="width: 100%; margin-top: 0.5rem;">
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn" style="flex: 1; border: 1px solid var(--border);"
-                    onclick="closeEditModal()">ยกเลิก</button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="saveProfileChange()">บันทึก</button>
+                    onclick="closeEditModal()" data-i18n="btn_cancel">ยกเลิก</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="saveProfileChange()" data-i18n="btn_save">บันทึก</button>
             </div>
         </div>
     </div>
@@ -154,12 +160,13 @@
         <div class="card" style="max-width: 400px; text-align: center;">
             <ion-icon name="checkmark-circle" size="large"
                 style="color: #10b981; font-size: 4rem; margin-bottom: 1rem;"></ion-icon>
-            <h2>ส่งข้อมูลสำเร็จ</h2>
-            <p style="color: var(--text-muted); margin: 1rem 0;">เราได้รับแจ้งความประสงค์ของคุณแล้ว</p>
-            <button class="btn btn-primary" onclick="closeModal()">ตกลง</button>
+            <h2 data-i18n="modal_success_title">ส่งข้อมูลสำเร็จ</h2>
+            <p style="color: var(--text-muted); margin: 1rem 0;" data-i18n="modal_success_desc">เราได้รับแจ้งความประสงค์ของคุณแล้ว</p>
+            <button class="btn btn-primary" onclick="closeModal()" data-i18n="btn_ok">ตกลง</button>
         </div>
     </div>
 
+    <script src="../translations.js"></script>
     <script src="../app.js"></script>
 </body>
 
