@@ -62,15 +62,13 @@ export class AuthController {
         });
       }
 
-      // Append timestamp to ensure username stays unique for multiple registrations
-      const username = `${estateRecord.full_name.replace(/\s+/g, '_')}_${Date.now()}`.toLowerCase();
       const password_hash = await bcrypt.hash(password, 10);
       const userId = uuidv4();
 
       db.prepare(`
-        INSERT INTO users (id, username, email, phone, password_hash, role, national_id, is_first_login, full_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)
-      `).run(userId, username, email, phone, password_hash, 'Resident', national_id, estateRecord.full_name);
+        INSERT INTO users (id, email, phone, password_hash, role, national_id, is_first_login, full_name)
+        VALUES (?, ?, ?, ?, ?, ?, 1, ?)
+      `).run(userId, email, phone, password_hash, 'Resident', national_id, estateRecord.full_name);
 
       console.log(`[FCM Backend] Registration SUCCESS! User ID: ${userId}`);
 
@@ -116,7 +114,6 @@ export class AuthController {
         token,
         user: {
           id: user.id,
-          username: user.username,
           role: user.role
         }
       });
@@ -164,7 +161,7 @@ export class AuthController {
 
       // Get basic user info
       const user = db.prepare(`
-        SELECT u.id, u.username, u.email, u.phone, u.role, u.full_name as name, u.is_first_login, r.house_number as houseId
+        SELECT u.id, u.email, u.phone, u.role, u.full_name as name, u.is_first_login, r.house_number as houseId
         FROM users u
         LEFT JOIN real_estate_records r ON u.national_id = r.national_id
         WHERE u.id = ?
@@ -179,6 +176,69 @@ export class AuthController {
         data: user
       });
     } catch (error) {
+      return res.status(500).json({ success: false, status_code: "SERVER_ERROR" });
+    }
+  }
+
+  /**
+   * PATCH /api/auth/profile
+   * Update current user's profile fields (name, email, phone, password)
+   */
+  static async updateProfile(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.id;
+      const { name, email, phone, password } = req.body;
+
+      // Build dynamic update
+      const updates: string[] = [];
+      const values: any[] = [];
+
+      if (name && typeof name === "string" && name.trim()) {
+        updates.push("full_name = ?");
+        values.push(name.trim());
+      }
+
+      if (email && typeof email === "string") {
+        const emailSchema = z.string().email();
+        const parsed = emailSchema.safeParse(email);
+        if (!parsed.success) {
+          return res.status(400).json({ success: false, status_code: "VALIDATION_ERROR", message: "Invalid email format" });
+        }
+        // Check uniqueness
+        const existing = db.prepare("SELECT id FROM users WHERE email = ? AND id != ?").get(email, userId);
+        if (existing) {
+          return res.status(409).json({ success: false, status_code: "EMAIL_TAKEN", message: "Email already in use" });
+        }
+        updates.push("email = ?");
+        values.push(email.trim());
+      }
+
+      if (phone && typeof phone === "string" && phone.trim()) {
+        updates.push("phone = ?");
+        values.push(phone.trim());
+      }
+
+      if (password && typeof password === "string") {
+        if (password.length < 8) {
+          return res.status(400).json({ success: false, status_code: "VALIDATION_ERROR", message: "Password must be at least 8 characters" });
+        }
+        const password_hash = await bcrypt.hash(password, 10);
+        updates.push("password_hash = ?");
+        values.push(password_hash);
+      }
+
+      if (updates.length === 0) {
+        return res.status(400).json({ success: false, status_code: "NO_CHANGES", message: "No valid fields to update" });
+      }
+
+      values.push(userId);
+      db.prepare(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`).run(...values);
+
+      console.log(`[FCM Backend] Profile updated for user ${userId}: ${updates.map(u => u.split(" =")[0]).join(", ")}`);
+
+      return res.status(200).json({ success: true, status_code: "PROFILE_UPDATED" });
+    } catch (error: any) {
+      console.error("[FCM Backend] Profile Update Error:", error);
       return res.status(500).json({ success: false, status_code: "SERVER_ERROR" });
     }
   }

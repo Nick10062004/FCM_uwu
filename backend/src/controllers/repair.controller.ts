@@ -22,6 +22,59 @@ const EvaluationSchema = z.object({
 
 export class RepairController {
   /**
+   * GET /api/repair/history
+   * Returns all requests (with tasks) for the resident's property.
+   * Security: filtered by property_id derived from user's national_id.
+   */
+  static async getResidentHistory(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.id;
+
+      // 1. Get user's national_id
+      const user = db.prepare("SELECT national_id FROM users WHERE id = ?").get(userId) as any;
+      if (!user) return res.status(404).json({ success: false, status_code: "USER_NOT_FOUND" });
+
+      // 2. Get house_number from real_estate_records
+      const estate = db.prepare("SELECT house_number FROM real_estate_records WHERE national_id = ?").get(user.national_id) as any;
+      if (!estate) return res.status(404).json({ success: false, status_code: "PROPERTY_NOT_FOUND" });
+
+      // 3. Get property_id from properties table
+      const property = db.prepare("SELECT id FROM properties WHERE house_number = ?").get(estate.house_number) as any;
+      if (!property) return res.status(404).json({ success: false, status_code: "PROPERTY_NOT_FOUND" });
+
+      // 4. Fetch all requests for this property with tasks
+      const requests = db.prepare(`
+        SELECT r.id, r.status, r.technician_id, r.repair_report, r.after_repair_image_url,
+               r.completed_at, r.created_at, r.updated_at,
+               u_tech.full_name as technician_name
+        FROM request r
+        LEFT JOIN users u_tech ON r.technician_id = u_tech.id
+        WHERE r.property_id = ?
+        ORDER BY r.created_at DESC
+      `).all(property.id) as any[];
+
+      const result = requests.map((req: any) => {
+        const tasks = db.prepare(`
+          SELECT t.id, t.description, t.urgency, t.status, t.task_report,
+                 t.after_repair_image_url, t.prefer_date,
+                 o.object_name, o.category
+          FROM task t
+          LEFT JOIN object o ON t.object_id = o.id
+          WHERE t.request_id = ?
+        `).all(req.id);
+
+        return { ...req, tasks };
+      });
+
+      return res.status(200).json({ success: true, data: result });
+
+    } catch (error) {
+      console.error("History Error:", error);
+      return res.status(500).json({ success: false, status_code: "SERVER_ERROR" });
+    }
+  }
+
+  /**
    * AI Intent Analysis
    */
   static async processIntent(req: Request, res: Response) {
@@ -138,7 +191,7 @@ export class RepairController {
           SET status = 'Completed', completed_at = CURRENT_TIMESTAMP 
           WHERE id = ?
         `).run(requestId);
-        
+
         return res.json({ success: true, status_code: "REQUEST_FULLY_COMPLETED" });
       }
 
@@ -160,7 +213,7 @@ export class RepairController {
 
       // Validate Request exists and belongs to resident
       const request = db.prepare("SELECT status, completed_at FROM request WHERE id = ? AND resident_id = ?").get(request_id, residentId) as any;
-      
+
       if (!request) return res.status(404).json({ success: false, status_code: "REQUEST_NOT_FOUND" });
       if (request.status !== 'Completed') return res.status(400).json({ success: false, status_code: "REQUEST_NOT_COMPLETED" });
 

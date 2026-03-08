@@ -32,13 +32,15 @@ END
 
 2 TEXTINCLUDE
 BEGIN
-    "#include ""winres.h""\r\n"
+    "#include ""winres.h""
+"
     "\0"
 END
 
 3 TEXTINCLUDE
 BEGIN
-    "\r\n"
+    "
+"
     "\0"
 END
 

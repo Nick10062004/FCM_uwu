@@ -10,5 +10,6 @@ authRouter.post("/login", AuthController.login);
 // Setup PIN requires user to be logged in and possessing a valid JWT token
 authRouter.post("/setup-pin", authMiddleware, AuthController.setupPin);
 authRouter.get("/profile", authMiddleware, AuthController.getProfile);
+authRouter.patch("/profile", authMiddleware, AuthController.updateProfile);
 
 export default authRouter;

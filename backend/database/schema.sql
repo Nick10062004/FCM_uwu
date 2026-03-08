@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS real_estate_records (
 -- 1. users: Core identity
 CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
-    username TEXT UNIQUE NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT,
     password_hash TEXT NOT NULL,

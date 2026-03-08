@@ -37,12 +37,11 @@ export class PersonnelController {
       const initialPasswordHash = await bcrypt.hash(national_id, saltRounds);
 
       const userId = uuidv4();
-      const username = full_name.toLowerCase().replace(/\s+/g, "_") + "_" + national_id.slice(-4);
 
       db.prepare(`
-        INSERT INTO users (id, username, email, phone, password_hash, role, national_id, is_first_login, full_name, face_image_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?, ?)
-      `).run(userId, username, email, phone, initialPasswordHash, role, national_id, full_name, face_image_url || null);
+        INSERT INTO users (id, email, phone, password_hash, role, national_id, is_first_login, full_name, face_image_url)
+        VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)
+      `).run(userId, email, phone, initialPasswordHash, role, national_id, full_name, face_image_url || null);
 
       return res.status(201).json({
         success: true,

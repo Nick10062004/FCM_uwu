@@ -4,6 +4,14 @@ import { authMiddleware, authorizeRole } from "../middlewares/auth.middleware";
 
 const repairRouter = Router();
 
+// Resident: Service History (filtered by property)
+repairRouter.get(
+  "/history",
+  authMiddleware,
+  authorizeRole(["Resident"]),
+  RepairController.getResidentHistory
+);
+
 // AI Analysis
 repairRouter.post("/intent", authMiddleware, RepairController.processIntent);
 
@@ -15,9 +23,9 @@ repairRouter.post("/confirm", authMiddleware, RepairController.confirmRequest);
  * Access: Technician or Jurisdictic
  */
 repairRouter.patch(
-  "/task/:taskId", 
-  authMiddleware, 
-  authorizeRole(["Technician", "Jurisdictic"]), 
+  "/task/:taskId",
+  authMiddleware,
+  authorizeRole(["Technician", "Jurisdictic"]),
   RepairController.updateTaskStatus
 );
 
@@ -26,9 +34,9 @@ repairRouter.patch(
  * Access: Resident Only
  */
 repairRouter.post(
-  "/evaluate", 
-  authMiddleware, 
-  authorizeRole(["Resident"]), 
+  "/evaluate",
+  authMiddleware,
+  authorizeRole(["Resident"]),
   RepairController.submitEvaluation
 );
 
